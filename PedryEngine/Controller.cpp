@@ -51,12 +51,51 @@ void Controller::ScanInput(GLFWwindow* window, Vector<vec4>& positions)
 	Engine::vecIterator.setFunction([deltaTime](vec4& value) {
 
 		vec4* location = &value;
-		value = PedryMath::Lerp(value, *--location, deltaTime * 10.0f);
+
+		value = PedryMath::Lerp(value, *--location, deltaTime);
+		value = PedryMath::Lerp(value, *--location, deltaTime);
+		value = PedryMath::Lerp(value, *--location, deltaTime);
+		value = PedryMath::Lerp(value, *--location, deltaTime);
+		value = PedryMath::Lerp(value, *--location, deltaTime);
+		value = PedryMath::Lerp(value, *--location, deltaTime);
+		value = PedryMath::Lerp(value, *--location, deltaTime);
+		value = PedryMath::Lerp(value, *--location, deltaTime);
+		value = PedryMath::Lerp(value, *--location, deltaTime);
+		value = PedryMath::Lerp(value, *--location, deltaTime);
+		value = PedryMath::Lerp(value, *--location, deltaTime);
+		value = PedryMath::Lerp(value, *--location, deltaTime);
+		value = PedryMath::Lerp(value, *--location, deltaTime);
+		value = PedryMath::Lerp(value, *--location, deltaTime);
+		value = PedryMath::Lerp(value, *--location, deltaTime);
+		value = PedryMath::Lerp(value, *--location, deltaTime);
+		value = PedryMath::Lerp(value, *--location, deltaTime);
+		value = PedryMath::Lerp(value, *--location, deltaTime);
+		value = PedryMath::Lerp(value, *--location, deltaTime);
+		value = PedryMath::Lerp(value, *--location, deltaTime);
+		value = PedryMath::Lerp(value, *--location, deltaTime);
+		value = PedryMath::Lerp(value, *--location, deltaTime);
+		value = PedryMath::Lerp(value, *--location, deltaTime);
+		value = PedryMath::Lerp(value, *--location, deltaTime);
+		value = PedryMath::Lerp(value, *--location, deltaTime);
+		value = PedryMath::Lerp(value, *--location, deltaTime);
+		value = PedryMath::Lerp(value, *--location, deltaTime);
+		value = PedryMath::Lerp(value, *--location, deltaTime);
+		value = PedryMath::Lerp(value, *--location, deltaTime);
+		value = PedryMath::Lerp(value, *--location, deltaTime);
+		value = PedryMath::Lerp(value, *--location, deltaTime);
+		value = PedryMath::Lerp(value, *--location, deltaTime);
+		value = PedryMath::Lerp(value, *--location, deltaTime);
+		value = PedryMath::Lerp(value, *--location, deltaTime);
+		value = PedryMath::Lerp(value, *--location, deltaTime);
+		value = PedryMath::Lerp(value, *--location, deltaTime);
+		value = PedryMath::Lerp(value, *--location, deltaTime);
+		value = PedryMath::Lerp(value, *--location, deltaTime);
+		value = PedryMath::Lerp(value, *--location, deltaTime);
 
 		});
 
 	Engine::vecIterator.process(&positions[1], INSTANCING_TEST-1);
-
 	Engine::vecIterator.waitForCompletion();
+
 
 }

@@ -12,9 +12,11 @@ void Engine::Run()
 
 	Vector<vec4> positions(INSTANCING_TEST);
 
-	vecIterator.setFunction([](vec4& value) {
+	vec4 defaultValue = { -(GLfloat).0f, (GLfloat).0f, (GLfloat).0f, (GLfloat).0f };
 
-		value = { (GLfloat).0f, (GLfloat).0f, (GLfloat).0f, (GLfloat).0f };
+	vecIterator.setFunction([defaultValue](vec4& value) {
+
+		value = defaultValue;
 
 	});
 
