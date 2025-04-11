@@ -1,0 +1,23 @@
+Buffer scale;
+
+vec mod;
+int bruh;
+
+
+
+float lmao;
+
+
+
+
+vec position;
+
+
+void main() 
+{
+	
+	
+	
+		mod *= 1;
+	position = mod;
+			}

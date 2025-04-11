@@ -1,0 +1,150 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Defaults">
+      <UniqueIdentifier>{d94129ef-fe42-4337-9d42-bd4783207c96}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Backend">
+      <UniqueIdentifier>{a679b84a-7150-4b56-b305-dab2b6e94875}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Backend\Managers">
+      <UniqueIdentifier>{2555177d-5c87-49c3-821f-8428d9ea8708}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Fronteend">
+      <UniqueIdentifier>{e7cd1ca2-d7cb-47a0-99bf-a56b1a644998}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Backend">
+      <UniqueIdentifier>{814a1191-7caa-4975-8802-84303c1608a5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Frontend">
+      <UniqueIdentifier>{9b64941f-0d9b-4079-8623-82475892d1e6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Backend\Managers">
+      <UniqueIdentifier>{3ffa6d29-60a9-43c2-ade7-d217f01956f8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Backend\Systems">
+      <UniqueIdentifier>{3daebe01-1ff4-400b-9e37-b20633722598}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Backend\Systems">
+      <UniqueIdentifier>{1bbdd0b6-9625-49f6-a071-c247815cc1aa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Backend\Math">
+      <UniqueIdentifier>{c68e816f-2569-40b3-a312-8ac0980e18d8}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ShaderManager.h">
+      <Filter>Header Files\Backend\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="ShapeManager.h">
+      <Filter>Header Files\Backend\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine.h">
+      <Filter>Header Files\Backend</Filter>
+    </ClInclude>
+    <ClInclude Include="main.h">
+      <Filter>Header Files\Backend</Filter>
+    </ClInclude>
+    <ClInclude Include="PengTranspiler.h">
+      <Filter>Header Files\Backend</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files\Backend</Filter>
+    </ClInclude>
+    <ClInclude Include="Shaders.h">
+      <Filter>Header Files\Backend</Filter>
+    </ClInclude>
+    <ClInclude Include="PedryEngine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller.h">
+      <Filter>Header Files\Backend\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer.h">
+      <Filter>Header Files\Backend\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader.h">
+      <Filter>Header Files\Backend\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="VisualShape.h">
+      <Filter>Header Files\Backend\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="PedryMath.h">
+      <Filter>Header Files\Backend\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Transform.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ParallelIterator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ShaderManager.cpp">
+      <Filter>Source Files\Backend\Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="ShapeManager.cpp">
+      <Filter>Source Files\Backend\Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine.cpp">
+      <Filter>Source Files\Backend</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files\Backend</Filter>
+    </ClCompile>
+    <ClCompile Include="PengTranspiler.cpp">
+      <Filter>Source Files\Backend</Filter>
+    </ClCompile>
+    <ClCompile Include="VisualShape.cpp">
+      <Filter>Source Files\Backend\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer.cpp">
+      <Filter>Source Files\Backend\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader.cpp">
+      <Filter>Source Files\Backend\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="Controller.cpp">
+      <Filter>Source Files\Backend\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="PedryMath.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Transform.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ParallelIterator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+    <None Include="PengShader.peng" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="PedryEngine.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Dshader.vert">
+      <Filter>Defaults</Filter>
+    </Text>
+    <Text Include="Dshader.frag">
+      <Filter>Defaults</Filter>
+    </Text>
+    <Text Include="output.txt" />
+  </ItemGroup>
+</Project>
