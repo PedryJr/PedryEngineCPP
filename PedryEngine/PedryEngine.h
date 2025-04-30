@@ -1,7 +1,17 @@
 #pragma once
 #ifndef PedryEngine
 #define PedryEngine
-#pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup")
+//#pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup")
+
+#if defined(_MSC_VER)
+#define FORCE_INLINE __forceinline
+#elif defined(__GNUC__) || defined(__clang__)
+#define FORCE_INLINE inline __attribute__((always_inline))
+#else
+#define FORCE_INLINE inline
+#endif
+
+#include <immintrin.h>
 
 #include <glm/simd/common.h>
 #include <glm/simd/exponential.h>
@@ -27,7 +37,6 @@
 #include <string>
 #include <vector>
 #include <functional>
-#include <xmmintrin.h>
 #include <cmath>
 
 #include <iostream>
@@ -41,7 +50,7 @@
 
 #define Clock std::chrono::system_clock::time_point
 #define TimeNow std::chrono::system_clock::now()
-#define Duration(old, fresh) std::chrono::duration<float>(fresh - old).count()
+#define Duration(old, fresh) std::chrono::duration<GLdouble>(fresh - old).count()
 
 #define Array std::array
 #define Vector std::vector

@@ -44,10 +44,11 @@ void Engine::Run()
 	}
 }
 
-GLfloat Engine::InnerDeltaTime()
+GLdouble Engine::InnerDeltaTime()
 {
 	return deltaTime;
 }
 
-GLfloat Engine::deltaTime = 0.0;
+GLdouble Engine::deltaTime = 0.0;
+
 ParallelIterator<vec4> Engine::vecIterator;

@@ -9,10 +9,10 @@ public:
 	void Run();
 	bool shouldTerminate;
 	static ParallelIterator<vec4> vecIterator;
-	static GLfloat InnerDeltaTime();
+	static GLdouble InnerDeltaTime();
 
 private:
-	static GLfloat deltaTime;
+	static GLdouble deltaTime;
 
 
 };

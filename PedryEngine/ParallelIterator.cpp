@@ -77,6 +77,22 @@ inline void ParallelIterator<T>::threadFunction(int threadId) {
     }
 }
 
-template class ParallelIterator<glm::vec<2, GLfloat>>;
-template class ParallelIterator<glm::vec<3, GLfloat>>;
-template class ParallelIterator<glm::vec<4, GLfloat>>;
+template class ParallelIterator<vec2>;
+template class ParallelIterator<vec3>;
+template class ParallelIterator<vec4>;
+template class ParallelIterator<GLfloat>;
+template class ParallelIterator<GLint>;
+template class ParallelIterator<GLushort>;
+template class ParallelIterator<GLubyte>;
+template class ParallelIterator<GLint64>;
+
+
+// Example usage
+//Engine::vecIterator.setFunction([deltaTime](vec4& value) {
+//
+//	//Operate on value
+// 
+//	});
+//
+//Engine::vecIterator.process(&positions[1], INSTANCING_TEST - 1);
+//Engine::vecIterator.waitForCompletion();
