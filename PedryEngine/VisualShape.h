@@ -1,6 +1,4 @@
 #pragma once
-#ifndef VisualShape_H
-#define VisualShape_H
 class VisualShape
 {
 public:
@@ -31,4 +29,3 @@ private:
 	void AllocateDefaultShape();
 
 };
-#endif

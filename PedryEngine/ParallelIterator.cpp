@@ -80,19 +80,25 @@ inline void ParallelIterator<T>::threadFunction(int threadId) {
 template class ParallelIterator<vec2>;
 template class ParallelIterator<vec3>;
 template class ParallelIterator<vec4>;
-template class ParallelIterator<GLfloat>;
-template class ParallelIterator<GLint>;
-template class ParallelIterator<GLushort>;
+template class ParallelIterator<mat4>;
+template class ParallelIterator<quat>;
+
+template class ParallelIterator<GLbyte>;
 template class ParallelIterator<GLubyte>;
+template class ParallelIterator<GLint>;
+template class ParallelIterator<GLuint>;
+template class ParallelIterator<GLfloat>;
+template class ParallelIterator<GLushort>;
 template class ParallelIterator<GLint64>;
 
+template class ParallelIterator<Component>;
+template class ParallelIterator<Component*>;
+template class ParallelIterator<GameObject>;
+template class ParallelIterator<GameObject*>;
 
-// Example usage
-//Engine::vecIterator.setFunction([deltaTime](vec4& value) {
-//
-//	//Operate on value
-// 
-//	});
-//
-//Engine::vecIterator.process(&positions[1], INSTANCING_TEST - 1);
+//Engine::vecIterator.setFunction([deltaTime](vec4& value)
+//    {
+//		//ITERATE
+//    });
+//Engine::vecIterator.process(/*Collection start*/, /*Collection size*/);
 //Engine::vecIterator.waitForCompletion();

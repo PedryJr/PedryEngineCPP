@@ -1,6 +1,4 @@
 #pragma once
-#ifndef PedryEngine
-#define PedryEngine
 //#pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup")
 
 #if defined(_MSC_VER)
@@ -44,6 +42,7 @@
 #include <mutex>
 #include <condition_variable>
 
+#include "ufbx.h"
 
 #define DEFAULT_SHAPE_COUNT (GLint)9
 #define DEFAULT_FORM_COUNT (GLint)3
@@ -55,11 +54,12 @@
 #define Array std::array
 #define Vector std::vector
 #define String std::string
+#define ToString std::to_string
 
 #define Size size_t
 #define FileInfo Stat
 
-#define INSTANCING_TEST (GLint) 10000
+#define INSTANCING_TEST (GLint) 1
 #define DeltaTime Engine::InnerDeltaTime()
 typedef struct stat Stat;
 
@@ -73,17 +73,30 @@ typedef struct stat Stat;
 #define vec_Right vec3(1.0F, 0.0F, 0.0F)
 #define vec_Forward vec3(0.0F, 0.0F, 1.0F)
 
+typedef struct DoubleBuffer {
+	vec4 element1;
+	vec4 element2;
+}DoubleBuffer;
+
+#define Log(output) std::cout << output << std::endl
+
+#include "Shaders.h"
+#include "Component.h"
+#include "Mesh.h"
+#include "Shader.h"
+#include "DrawCallBatch.h"
+#include "DrawCallManager.h"
+#include "Transform.h"
+#include "AssetManager.h"
+#include "GameObject.h"
 #include "PedryMath.h"
 #include "ParallelIterator.h"
-#include "Shaders.h"
-#include "Shader.h"
 #include "VisualShape.h"
-#include "Shader.h"
 #include "Renderer.h"
+#include "GlobalCamera.h"
 #include "main.h"
 #include "Engine.h"
 #include "Controller.h"
 #include "PengTranspiler.h"
 #include "ShaderManager.h"
 #include "ShapeManager.h"
-#endif

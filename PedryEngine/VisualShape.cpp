@@ -47,6 +47,7 @@ Shader* VisualShape::GetShader()
 	return shader;
 }
 
+
 void VisualShape::AllocateDefaultShape()
 {
 	GLfloat defaultShape[DEFAULT_SHAPE_COUNT] =
@@ -61,13 +62,11 @@ void VisualShape::AllocateDefaultShape()
 	for (int i = 0; i < DEFAULT_SHAPE_COUNT; i++) positions.at(i) = (defaultShape[i]);
 	points = DEFAULT_SHAPE_COUNT;
 
-	GLuint defaultForm[DEFAULT_FORM_COUNT] = {
-	0, 1, 2,
-	};
+	GLuint defaultForm[DEFAULT_FORM_COUNT] = { 0, 1, 2, };
 
 	indices = Vector<GLuint>(DEFAULT_FORM_COUNT);
 	for (int i = 0; i < DEFAULT_FORM_COUNT; i++) indices.at(i) = (defaultForm[i]);
 	form = DEFAULT_FORM_COUNT;
 
-	shader->UploadShape(positions.data(), indices.data(), points, form);
+	shader->UploadShape(positions.data(), indices.data(), (GLfloat*)0, (GLfloat*)0, (GLfloat*)0, points, form);
 }

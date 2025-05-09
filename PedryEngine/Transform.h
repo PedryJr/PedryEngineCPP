@@ -1,9 +1,29 @@
 #pragma once
-#ifndef Transform_H
-#define Transform_H
-class Transform
+class Transform : public Component
 {
 
-};
+public:
 
-#endif // PARALLEL_ITERATOR_H
+	void Initialize() override;
+	void Simulate() override;
+	void Update() override;
+
+	void SetPosition(vec3 position);
+	void SetScale(vec3 scale);
+	void SetRotation(vec3 euler);
+
+	vec3 position;
+	vec3 scale;
+	quat rotation;
+
+	GLuint modelIndex;
+	DrawCallBatch* assignedBatch = nullptr;
+
+	void SetModelIndex(GLuint modelIndex);
+	GLuint GetModelIndex();
+
+	void UpdateModel();
+
+	void SetModelLocation(DrawCallBatch& assignedBatch, GLint index);
+
+};

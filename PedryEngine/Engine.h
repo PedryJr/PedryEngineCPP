@@ -1,6 +1,4 @@
 #pragma once
-#ifndef Engine_H
-#define Engine_H
 class Engine
 {
 
@@ -9,11 +7,11 @@ public:
 	void Run();
 	bool shouldTerminate;
 	static ParallelIterator<vec4> vecIterator;
-	static GLdouble InnerDeltaTime();
+
+	static FORCE_INLINE GLdouble InnerDeltaTime() { return deltaTime; }
 
 private:
 	static GLdouble deltaTime;
 
 
 };
-#endif // PARALLEL_ITERATOR_H

@@ -1,7 +1,4 @@
 #pragma once
-
-#ifndef ParallelIterator_H
-#define ParallelIterator_H
 template<typename T>
 class ParallelIterator {
 private:
@@ -31,4 +28,3 @@ public:
 
     size_t getThreadCount() const;
 };
-#endif
