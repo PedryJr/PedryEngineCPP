@@ -20,7 +20,7 @@ public:
 		GLdouble currentX;
 		GLdouble currentY;
 
-		glfwGetCursorPos(Renderer::GetWindow(), &currentX, &currentY);
+		glfwGetCursorPos(RenderSystem::GetWindow(), &currentX, &currentY);
 
 		if (firstMouse) {
 			lastX = currentX;
@@ -42,17 +42,17 @@ public:
 
 		vec3 inputDirection = vec3(0.0F, 0.0F, 0.0F);
 
-		if (glfwGetKey(Renderer::GetWindow(), GLFW_KEY_W) == GLFW_PRESS) inputDirection.z += 1.0f;
-		if (glfwGetKey(Renderer::GetWindow(), GLFW_KEY_S) == GLFW_PRESS) inputDirection.z -= 1.0f;
+		if (glfwGetKey(RenderSystem::GetWindow(), GLFW_KEY_W) == GLFW_PRESS) inputDirection.z += 1.0f;
+		if (glfwGetKey(RenderSystem::GetWindow(), GLFW_KEY_S) == GLFW_PRESS) inputDirection.z -= 1.0f;
 
-		if (glfwGetKey(Renderer::GetWindow(), GLFW_KEY_A) == GLFW_PRESS) inputDirection.x += 1.0f;
-		if (glfwGetKey(Renderer::GetWindow(), GLFW_KEY_D) == GLFW_PRESS) inputDirection.x -= 1.0f;
+		if (glfwGetKey(RenderSystem::GetWindow(), GLFW_KEY_A) == GLFW_PRESS) inputDirection.x += 1.0f;
+		if (glfwGetKey(RenderSystem::GetWindow(), GLFW_KEY_D) == GLFW_PRESS) inputDirection.x -= 1.0f;
 		return inputDirection;
 	}
 
 	static void UpdateInput(GLfloat deltaTime) {
 
-		GLFWwindow* window = Renderer::GetWindow();
+		GLFWwindow* window = RenderSystem::GetWindow();
 
 		vec3 inputDirection = GetInputDirection();
 		vec2 mouseDelta = GetMouseDelta();

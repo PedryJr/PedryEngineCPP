@@ -1,6 +1,6 @@
 #pragma once
-#include "PedryEngine.h"
 
+#include "PedryEngine.h"
 
 Shader::Shader()
 {
@@ -33,70 +33,100 @@ Shader::~Shader()
 void Shader::GenerateBuffers()
 {
 
-    glBindVertexArray(-1);
     Shader::EnsureUseProgram(programId);
 
     glGenVertexArrays(1, &vertexArrayId);
     glBindVertexArray(vertexArrayId);
 
     glGenBuffers(1, &positionBuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, positionBuffer);
 
     glGenBuffers(1, &normalBuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, positionBuffer);
 
     glGenBuffers(1, &uvBuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, uvBuffer);
 
     glGenBuffers(1, &tangentBuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, tangentBuffer);
 
     glGenBuffers(1, &elementBuffer);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementBuffer);
 
     glGenBuffers(1, &vertexModelsBuffer);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, vertexModelsBuffer);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, vertexModelsBuffer);
+
+    glGenBuffers(1, &multiTextureBuffer);
 
     std::cout << "MODEL BUFFER = " << vertexModelsBuffer << std::endl;
 
 }
 
-void Shader::UploadShape(GLfloat* positions, GLuint* indices, GLfloat* normals, GLfloat* uvs, GLfloat* tangents, GLint points, GLint form)
+void Shader::UploadMesh(Mesh* mesh)
 {
+
+    GLfloat* positions = mesh->vertices.data();
+    GLuint* indices = mesh->indices.data();
+    GLfloat* normals = mesh->normals.data();
+    GLfloat* uvs = mesh->uvs.data();
+    GLfloat* tangents = mesh->tangents.data();
+
+    GLint positionsCount = mesh->vertices.size();
+    GLint indiciesCount = mesh->indices.size();
+    GLint normalsCount = mesh->normals.size();
+    GLint uvsCount = mesh->uvs.size();
+    GLint tangentsCount = mesh->tangents.size();
+
+    std::cout << positionsCount << programId << std::endl;
+    std::cout << indiciesCount << programId << std::endl;
+
 	Shader::EnsureUseProgram(programId);
 	glBindVertexArray(vertexArrayId);
 
 	glBindBuffer(GL_ARRAY_BUFFER, positionBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * points, positions, GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * positionsCount, positions, GL_STATIC_COPY);
     GLint positionLocation = glGetAttribLocation(programId, "vertexPosition");
 	glVertexAttribPointer(positionLocation, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 3, (void*)0);
     glEnableVertexAttribArray(positionLocation);
 
+
     glBindBuffer(GL_ARRAY_BUFFER, normalBuffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * points, normals, GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * normalsCount, normals, GL_STATIC_COPY);
     GLint normalLocation = glGetAttribLocation(programId, "vertexNormal");
     glVertexAttribPointer(normalLocation, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 3, (void*)0);
     glEnableVertexAttribArray(normalLocation);
 
     glBindBuffer(GL_ARRAY_BUFFER, uvBuffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * points, uvs, GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * uvsCount, uvs, GL_STATIC_COPY);
     GLint uvLocation = glGetAttribLocation(programId, "vertexUv");
     glVertexAttribPointer(uvLocation, 2, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 2, (void*)0);
     glEnableVertexAttribArray(uvLocation);
 
+
     glBindBuffer(GL_ARRAY_BUFFER, tangentBuffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * points, tangents, GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * tangentsCount, tangents, GL_STATIC_COPY);
     GLint tangentLocation = glGetAttribLocation(programId, "vertexTangent");
     glVertexAttribPointer(tangentLocation, 4, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 4, (void*)0);
     glEnableVertexAttribArray(tangentLocation);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementBuffer);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * form, indices, GL_DYNAMIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * indiciesCount, indices, GL_STATIC_COPY);
 
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, vertexModelsBuffer);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, 0, NULL, GL_DYNAMIC_DRAW);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, 0, NULL, GL_STATIC_COPY);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, vertexModelsBuffer);
+
+    Vector<GLuint64> textureHandles;
+
+    GLuint64 handle = glGetTextureHandleARB(AssetManager::LoadTexture("default"));
+    glMakeTextureHandleResidentARB(handle);
+    textureHandles.push_back(handle);
+
+    std::cout << "LOOL" << handle << std::endl;
+
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, multiTextureBuffer);
+    glNamedBufferStorage(
+        multiTextureBuffer,
+        sizeof(GLuint64) * textureHandles.size(),
+        (const void*)textureHandles.data(),
+        GL_DYNAMIC_STORAGE_BIT
+    );
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, multiTextureBuffer);
+
 
 }
 

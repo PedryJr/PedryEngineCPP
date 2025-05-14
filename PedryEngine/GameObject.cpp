@@ -1,8 +1,11 @@
 #pragma once
+
 #include "PedryEngine.h"
 
 GameObject::GameObject()
 {
+
+	transform = AddComponent<Transform>();
 
 }
 
@@ -11,6 +14,7 @@ GameObject::~GameObject()
 	// Clean up components
 	for (Component* component : components) delete component;
 	components.clear();
+	delete transform;
 }
 
 void GameObject::AddComponent(Component* component)
@@ -23,7 +27,10 @@ void GameObject::AddComponent(Component* component)
 		if (existingComponent == component) return;
 	}
 	components.push_back(component);
+	component->transform = transform;
+	component->gameObject = this;
 	component->Initialize();
+
 }
 
 void GameObject::RemoveComponent(Component* component)

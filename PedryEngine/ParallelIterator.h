@@ -2,7 +2,7 @@
 template<typename T>
 class ParallelIterator {
 private:
-    std::function<void(T&)> workFunction;
+    std::function<void(T&, GLint)> workFunction;
     size_t numThreads;
     std::vector<std::thread> threads;
     std::atomic<bool> running;
@@ -13,14 +13,14 @@ private:
     std::mutex mutex;
     std::condition_variable cv;
 
-    void threadFunction(int threadId);
+    void threadFunction(GLint threadId);
 
 public:
     ParallelIterator();
 
     ~ParallelIterator();
 
-    void setFunction(std::function<void(T&)> func);
+    void setFunction(std::function<void(T&, GLint)> func);
 
     void process(T* array, size_t size);
 

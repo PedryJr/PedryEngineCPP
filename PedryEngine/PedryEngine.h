@@ -37,6 +37,7 @@
 #include <functional>
 #include <cmath>
 
+#include <chrono>
 #include <iostream>
 #include <atomic>
 #include <mutex>
@@ -69,19 +70,21 @@ typedef struct stat Stat;
 #define quat glm::quat
 #define mat4 glm::mat4
 
+struct Triangle {
+    vec3 a, b, c;
+};
+
 #define vec_UP vec3(0.0F, 1.0F, 0.0F)
 #define vec_Right vec3(1.0F, 0.0F, 0.0F)
 #define vec_Forward vec3(0.0F, 0.0F, 1.0F)
 
-typedef struct DoubleBuffer {
-	vec4 element1;
-	vec4 element2;
-}DoubleBuffer;
-
 #define Log(output) std::cout << output << std::endl
+
+#include "TypeDeclare.h"
 
 #include "Shaders.h"
 #include "Component.h"
+#include "Renderer.h"
 #include "Mesh.h"
 #include "Shader.h"
 #include "DrawCallBatch.h"
@@ -91,12 +94,11 @@ typedef struct DoubleBuffer {
 #include "GameObject.h"
 #include "PedryMath.h"
 #include "ParallelIterator.h"
-#include "VisualShape.h"
-#include "Renderer.h"
+#include "RenderSystem.h"
 #include "GlobalCamera.h"
 #include "main.h"
 #include "Engine.h"
-#include "Controller.h"
 #include "PengTranspiler.h"
 #include "ShaderManager.h"
-#include "ShapeManager.h"
+#include "Game.h"
+#include "MyRotator.h"

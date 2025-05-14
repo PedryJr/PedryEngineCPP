@@ -22,6 +22,7 @@ public:
 	void SetModelIndex(GLuint modelIndex);
 	GLuint GetModelIndex();
 
+	mat4 GetModelMatrix();
 	void UpdateModel();
 
 	void SetModelLocation(DrawCallBatch& assignedBatch, GLint index);

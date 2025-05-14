@@ -59,6 +59,7 @@ layout(std430, binding = 1) buffer Matrices {
 
 out vec3 normalOut;
 out vec3 FragPos;
+out vec2 FragCoord;
 
 uniform mat4 rotationMatrix;
 uniform mat4 cameraMatrix;
@@ -71,7 +72,9 @@ void main()
 
     gl_Position = cameraMatrix * modelMatrix * vec4(vertexPosition, 1.0);
     normalOut = normalMatrix * vertexNormal;
+
     FragPos = vec3(modelMatrix * vec4(vertexPosition, 1.0));
+    FragCoord = vertexUv;
 
 }
 )V0G0N"
@@ -79,34 +82,52 @@ void main()
 #define Frag3D R"V0G0N(
 #version 430 core
 
+#extension GL_ARB_bindless_texture : require
+
+
+layout(binding = 2, std430) readonly buffer ssbo3 {
+    sampler2D textures[];
+};
+
+
 in vec3 normalOut;
 in vec3 FragPos;
+in vec2 FragCoord;
 
 uniform vec3 lightPos;
+uniform vec3 camPos;
 
 out vec4 FragColor;
+
+float specularStrength = 1;
 
 void main()
 {
 
+    sampler2D textureSampler = textures[0];
     vec3 lightColor = vec3(1.0, 1.0, 1.0);
+    float lightDistance = 400;
+    float distanceToLight = distance(FragPos, lightPos);
+    lightColor = lightColor / (distanceToLight / lightDistance);
+
+    lightColor = clamp(lightColor, 0, 1);
+
+    vec4 texColor = texture(textureSampler, FragCoord);
 
     vec3 norm = normalize(normalOut);
-    vec3 lightDir = normalize(lightPos - FragPos);  
+    vec3 lightDir = normalize(lightPos - FragPos);
+
+    vec3 viewDir = normalize(camPos - FragPos);
+    vec3 reflectDir = reflect(-lightDir, norm);
+
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 40);
+    vec3 specular = specularStrength * spec * lightColor;
 
     float diff = max(dot(norm, lightDir), 0.0);
     vec3 diffuse = diff * lightColor;
+    vec3 result = (diffuse + specular) * vec3(texColor);
+    FragColor = vec4(result, 1.0);
 
-    FragColor = vec4(diffuse, 1.0);
-
-    vec4 lmao = vec4(normalOut, 1.0);
-
-    lmao.x = abs(lmao.x);
-    lmao.y = abs(lmao.y);
-    lmao.z = abs(lmao.z);
-    lmao.w = abs(lmao.w);
-
-    FragColor = lmao;
 
 }
 )V0G0N"

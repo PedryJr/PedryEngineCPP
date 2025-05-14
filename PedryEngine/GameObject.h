@@ -4,6 +4,8 @@ class GameObject
 
 public:
 
+	Transform* transform;
+
 	GameObject();
 	~GameObject();
 
@@ -32,6 +34,8 @@ public:
 		return component;
 	}
 
+private:
+	
 	Vector<Component*> components;
 
 };

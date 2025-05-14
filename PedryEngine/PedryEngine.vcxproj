@@ -22,7 +22,7 @@
     <VCProjectVersion>17.0</VCProjectVersion>
     <ProjectGuid>{58DFE488-8F47-4150-A79E-D724F1785840}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.26100.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -50,7 +50,7 @@
     <PreferredToolArchitecture>x64</PreferredToolArchitecture>
     <CharacterSet>Unicode</CharacterSet>
     <UseOfMfc>false</UseOfMfc>
-    <VCToolsVersion>14.42.34433</VCToolsVersion>
+    <VCToolsVersion>14.44.35207</VCToolsVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -101,7 +101,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard>stdcpp23</LanguageStandard>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -188,47 +188,49 @@
   <ItemGroup>
     <ClInclude Include="AssetManager.h" />
     <ClInclude Include="Component.h" />
-    <ClInclude Include="Controller.h" />
     <ClInclude Include="DrawCallBatch.h" />
     <ClInclude Include="DrawCallManager.h" />
+    <ClInclude Include="Game.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="GlobalCamera.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="Engine.h" />
     <ClInclude Include="Mesh.h" />
+    <ClInclude Include="MyRotator.h" />
     <ClInclude Include="ParallelIterator.h" />
     <ClInclude Include="PedryEngine.h" />
     <ClInclude Include="PedryMath.h" />
     <ClInclude Include="PengTranspiler.h" />
+    <ClInclude Include="RenderSystem.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="ShaderManager.h" />
     <ClInclude Include="Shaders.h" />
-    <ClInclude Include="ShapeManager.h" />
+    <ClInclude Include="stb_image.h" />
     <ClInclude Include="Transform.h" />
+    <ClInclude Include="TypeDeclare.h" />
     <ClInclude Include="ufbx.h" />
-    <ClInclude Include="VisualShape.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="Shader.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssetManager.cpp" />
     <ClCompile Include="Component.cpp" />
-    <ClCompile Include="Controller.cpp" />
     <ClCompile Include="DrawCallBatch.cpp" />
     <ClCompile Include="DrawCallManager.cpp" />
+    <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GlobalCamera.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Engine.cpp" />
     <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="MyRotator.cpp" />
     <ClCompile Include="ParallelIterator.cpp" />
     <ClCompile Include="PedryMath.cpp" />
     <ClCompile Include="PengTranspiler.cpp" />
+    <ClCompile Include="RenderSystem.cpp" />
     <ClCompile Include="ShaderManager.cpp" />
-    <ClCompile Include="ShapeManager.cpp" />
     <ClCompile Include="Transform.cpp" />
     <ClCompile Include="ufbx.cpp" />
-    <ClCompile Include="VisualShape.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Shader.cpp" />
   </ItemGroup>

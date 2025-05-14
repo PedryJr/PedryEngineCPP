@@ -7,6 +7,8 @@ public:
 
 	static Mesh* LoadMesh(const String& meshName);
 
+	static GLuint LoadTexture(const String& textureName);
+
 
 
 	static FORCE_INLINE GLulong NameToId(const String& name) {

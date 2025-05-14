@@ -1,3 +1,5 @@
+#pragma once
+
 #include "PedryEngine.h"
 
 GLdouble GlobalCamera::lastX = 0;

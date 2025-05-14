@@ -1,4 +1,5 @@
 #pragma once
+
 #include "PedryEngine.h"
 
 using namespace std;
@@ -24,7 +25,7 @@ inline ParallelIterator<T>::~ParallelIterator() {
 }
 
 template<typename T>
-inline void ParallelIterator<T>::setFunction(function<void(T&)> func) {
+inline void ParallelIterator<T>::setFunction(function<void(T&, GLint)> func) {
     workFunction = func;
 }
 
@@ -58,7 +59,7 @@ inline size_t ParallelIterator<T>::getThreadCount() const {
 }
 
 template<typename T>
-inline void ParallelIterator<T>::threadFunction(int threadId) {
+inline void ParallelIterator<T>::threadFunction(GLint threadId) {
     while (running) {
         {
             unique_lock<std::mutex> lock(mutex);
@@ -69,9 +70,10 @@ inline void ParallelIterator<T>::threadFunction(int threadId) {
         }
         size_t index;
         while (hasWork && (index = currentIndex.fetch_add(1)) < arraySize) {
-            workFunction(arrayData[index]);
+            workFunction(arrayData[index], index);
         }
         if (currentIndex >= arraySize) {
+            std::lock_guard<std::mutex> lock(mutex);
             hasWork = false;
         }
     }
@@ -90,6 +92,7 @@ template class ParallelIterator<GLuint>;
 template class ParallelIterator<GLfloat>;
 template class ParallelIterator<GLushort>;
 template class ParallelIterator<GLint64>;
+template class ParallelIterator<Triangle>;
 
 template class ParallelIterator<Component>;
 template class ParallelIterator<Component*>;

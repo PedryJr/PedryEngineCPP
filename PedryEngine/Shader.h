@@ -7,7 +7,7 @@ public:
 	~Shader();
 
 	//Exposed Functions
-	void UploadShape(GLfloat* positions, GLuint* indices, GLfloat* normals, GLfloat* uvs, GLfloat* tangents, GLint points, GLint form);
+	void UploadMesh(Mesh* mesh);
 
 	GLuint GetProgramID();
 	GLuint GetVertexArrayID();
@@ -38,6 +38,8 @@ private:
 	GLuint elementBuffer;
 
 	GLuint vertexModelsBuffer;
+
+	GLuint multiTextureBuffer;
 
 	static GLuint activeProgram;
 

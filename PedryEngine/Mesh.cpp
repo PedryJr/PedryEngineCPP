@@ -1,6 +1,7 @@
 #pragma once
+
 #include "PedryEngine.h"
-#include <unordered_map>
+
 
 struct TangentBuilder {
 	vec3 pos[3];
@@ -9,11 +10,11 @@ struct TangentBuilder {
 };
 
 struct VertexKey {
-	GLint posIndex;
-	GLint normIndex;
-	GLint uvIndex;
-	GLint tangentIndex;
-	GLint colorIndex;
+	GLuint posIndex;
+	GLuint normIndex;
+	GLuint uvIndex;
+	GLuint tangentIndex;
+	GLuint colorIndex;
 
 	bool operator==(const VertexKey& other) const {
 		return posIndex == other.posIndex &&
@@ -26,19 +27,17 @@ struct VertexKey {
 
 namespace std {
 	template<> struct hash<VertexKey> {
-		size_t operator()(const VertexKey& k) const {
-			size_t h = std::hash<GLint>()(k.posIndex);
-			h ^= std::hash<GLint>()(k.normIndex) << 1;
-			h ^= std::hash<GLint>()(k.uvIndex) << 2;
-			h ^= std::hash<GLint>()(k.tangentIndex) << 3;
-			h ^= std::hash<GLint>()(k.colorIndex) << 4;
+		GLuint operator()(const VertexKey& k) const {
+			GLuint h = std::hash<GLuint>()(k.posIndex);
+			h ^= std::hash<GLuint>()(k.normIndex) << 1;
+			h ^= std::hash<GLuint>()(k.uvIndex) << 2;
+			h ^= std::hash<GLuint>()(k.tangentIndex) << 3;
+			h ^= std::hash<GLuint>()(k.colorIndex) << 4;
 			return h;
 		}
 	};
 }
 
-#define to_vec2(ufbx_vec2) vec2(ufbx_vec2.x, ufbx_vec2.y)
-#define to_vec3(ufbx_vec3) vec3(ufbx_vec3.x, ufbx_vec3.y, ufbx_vec3.z)
 
 Mesh::Mesh(ufbx_mesh* loadedMesh, const GLulong& meshId)
 {
@@ -50,17 +49,18 @@ Mesh::Mesh(ufbx_mesh* loadedMesh, const GLulong& meshId)
 	Vector<GLfloat>& storedTangents = this->tangents;
 	Vector<GLfloat>& storedColors = this->colors;
 	Vector<GLuint>& storedIndices = this->indices;
+	Vector<Triangle>& storedTriangles = this->triangles;
 
 	std::unordered_map<VertexKey, GLuint> uniqueVertices;
 	GLuint nextIndex = 0;
 
-	for (GLint i = 0; i < loadedMesh->vertex_indices.count; ++i)
+	for (GLuint i = 0; i < loadedMesh->vertex_indices.count; ++i)
 	{
-		GLint posIndex = loadedMesh->vertex_position.indices.data[i];
-		GLint normIndex = loadedMesh->vertex_normal.indices.data[i];
-		GLint uvIndex = loadedMesh->vertex_uv.indices.count > 0 ? loadedMesh->vertex_uv.indices.data[i] : 0;
-		GLint tangentIndex = loadedMesh->vertex_tangent.indices.count > 0 ? loadedMesh->vertex_tangent.indices.data[i] : 0;
-		GLint colorIndex = loadedMesh->vertex_color.indices.count > 0 ? loadedMesh->vertex_color.indices.data[i] : 0;
+		GLuint posIndex = loadedMesh->vertex_position.indices.data[i];
+		GLuint normIndex = loadedMesh->vertex_normal.indices.data[i];
+		GLuint uvIndex = loadedMesh->vertex_uv.indices.count > 0 ? loadedMesh->vertex_uv.indices.data[i] : 0;
+		GLuint tangentIndex = loadedMesh->vertex_tangent.indices.count > 0 ? loadedMesh->vertex_tangent.indices.data[i] : 0;
+		GLuint colorIndex = loadedMesh->vertex_color.indices.count > 0 ? loadedMesh->vertex_color.indices.data[i] : 0;
 
 		VertexKey key{ posIndex, normIndex, uvIndex, tangentIndex, colorIndex };
 
@@ -94,7 +94,7 @@ Mesh::Mesh(ufbx_mesh* loadedMesh, const GLulong& meshId)
 				storedTangents.push_back(tangent.x);
 				storedTangents.push_back(tangent.y);
 				storedTangents.push_back(tangent.z);
-				storedTangents.push_back(0); // handedness
+				storedTangents.push_back(0.0F); // handedness
 			}
 
 			// Assign unique index
@@ -102,6 +102,54 @@ Mesh::Mesh(ufbx_mesh* loadedMesh, const GLulong& meshId)
 			uniqueVertices[key] = nextIndex++;
 		}
 	}
+
+	Triangle triangleBuffer = {vec3(0), vec3(0), vec3(0)};
+	GLuint trianglePoint = 0;
+	for (GLuint trIndex = 0; trIndex < storedIndices.size(); trIndex++)
+	{
+		GLuint pointStride = storedIndices[trIndex] * 3;
+		vec3 point = vec3(vertices[pointStride + 0], vertices[pointStride + 1], vertices[pointStride + 2]);
+		switch (trianglePoint)
+		{
+		case 0:
+			triangleBuffer.a = point;
+			break;
+		case 1:
+			triangleBuffer.b = point;
+			break;
+		case 2:
+			triangleBuffer.c = point;
+			break;
+
+		default:
+			break;
+
+		}
+
+		trianglePoint++;
+
+		if(trianglePoint == 3)
+		{
+			storedTriangles.push_back(triangleBuffer);
+			trianglePoint = 0;
+		}
+
+		/*
+		triangleBuffer.a.x = vertices[indices[trIndex + 0] * 3 + 0];
+		triangleBuffer.a.y = vertices[indices[trIndex + 0] * 3 + 1];
+		triangleBuffer.a.z = vertices[indices[trIndex + 0] * 3 + 2];
+
+		triangleBuffer.b.x = vertices[indices[trIndex + 1] * 3 + 0];
+		triangleBuffer.b.y = vertices[indices[trIndex + 1] * 3 + 1];
+		triangleBuffer.b.z = vertices[indices[trIndex + 1] * 3 + 2];
+
+		triangleBuffer.c.x = vertices[indices[trIndex + 2] * 3 + 0];
+		triangleBuffer.c.y = vertices[indices[trIndex + 2] * 3 + 1];
+		triangleBuffer.c.z = vertices[indices[trIndex + 2] * 3 + 2];*/
+
+	}
+
+	std::cout << vertices.size() / 3 << " || " << triangles.size() << std::endl;
 
 }
 

@@ -48,9 +48,6 @@
     <ClInclude Include="ShaderManager.h">
       <Filter>Header Files\Backend\Managers</Filter>
     </ClInclude>
-    <ClInclude Include="ShapeManager.h">
-      <Filter>Header Files\Backend\Managers</Filter>
-    </ClInclude>
     <ClInclude Include="Engine.h">
       <Filter>Header Files\Backend</Filter>
     </ClInclude>
@@ -69,16 +66,10 @@
     <ClInclude Include="PedryEngine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Controller.h">
-      <Filter>Header Files\Backend\Systems</Filter>
-    </ClInclude>
     <ClInclude Include="Renderer.h">
       <Filter>Header Files\Backend\Systems</Filter>
     </ClInclude>
     <ClInclude Include="Shader.h">
-      <Filter>Header Files\Backend\Systems</Filter>
-    </ClInclude>
-    <ClInclude Include="VisualShape.h">
       <Filter>Header Files\Backend\Systems</Filter>
     </ClInclude>
     <ClInclude Include="PedryMath.h">
@@ -114,12 +105,24 @@
     <ClInclude Include="GlobalCamera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Game.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MyRotator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderSystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="stb_image.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TypeDeclare.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ShaderManager.cpp">
-      <Filter>Source Files\Backend\Managers</Filter>
-    </ClCompile>
-    <ClCompile Include="ShapeManager.cpp">
       <Filter>Source Files\Backend\Managers</Filter>
     </ClCompile>
     <ClCompile Include="Engine.cpp">
@@ -131,16 +134,10 @@
     <ClCompile Include="PengTranspiler.cpp">
       <Filter>Source Files\Backend</Filter>
     </ClCompile>
-    <ClCompile Include="VisualShape.cpp">
-      <Filter>Source Files\Backend\Systems</Filter>
-    </ClCompile>
     <ClCompile Include="Renderer.cpp">
       <Filter>Source Files\Backend\Systems</Filter>
     </ClCompile>
     <ClCompile Include="Shader.cpp">
-      <Filter>Source Files\Backend\Systems</Filter>
-    </ClCompile>
-    <ClCompile Include="Controller.cpp">
       <Filter>Source Files\Backend\Systems</Filter>
     </ClCompile>
     <ClCompile Include="PedryMath.cpp">
@@ -174,6 +171,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="GlobalCamera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Game.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MyRotator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
