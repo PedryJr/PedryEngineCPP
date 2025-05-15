@@ -49,7 +49,7 @@ Mesh::Mesh(ufbx_mesh* loadedMesh, const GLulong& meshId)
 	Vector<GLfloat>& storedTangents = this->tangents;
 	Vector<GLfloat>& storedColors = this->colors;
 	Vector<GLuint>& storedIndices = this->indices;
-	Vector<Triangle>& storedTriangles = this->triangles;
+	Vector<WorldTriangle>& storedTriangles = this->triangles;
 
 	std::unordered_map<VertexKey, GLuint> uniqueVertices;
 	GLuint nextIndex = 0;
@@ -103,7 +103,7 @@ Mesh::Mesh(ufbx_mesh* loadedMesh, const GLulong& meshId)
 		}
 	}
 
-	Triangle triangleBuffer = {vec3(0), vec3(0), vec3(0)};
+	WorldTriangle triangleBuffer;
 	GLuint trianglePoint = 0;
 	for (GLuint trIndex = 0; trIndex < storedIndices.size(); trIndex++)
 	{
@@ -112,13 +112,13 @@ Mesh::Mesh(ufbx_mesh* loadedMesh, const GLulong& meshId)
 		switch (trianglePoint)
 		{
 		case 0:
-			triangleBuffer.a = point;
+			triangleBuffer.localA = point;
 			break;
 		case 1:
-			triangleBuffer.b = point;
+			triangleBuffer.localB = point;
 			break;
 		case 2:
-			triangleBuffer.c = point;
+			triangleBuffer.localC = point;
 			break;
 
 		default:
@@ -133,19 +133,6 @@ Mesh::Mesh(ufbx_mesh* loadedMesh, const GLulong& meshId)
 			storedTriangles.push_back(triangleBuffer);
 			trianglePoint = 0;
 		}
-
-		/*
-		triangleBuffer.a.x = vertices[indices[trIndex + 0] * 3 + 0];
-		triangleBuffer.a.y = vertices[indices[trIndex + 0] * 3 + 1];
-		triangleBuffer.a.z = vertices[indices[trIndex + 0] * 3 + 2];
-
-		triangleBuffer.b.x = vertices[indices[trIndex + 1] * 3 + 0];
-		triangleBuffer.b.y = vertices[indices[trIndex + 1] * 3 + 1];
-		triangleBuffer.b.z = vertices[indices[trIndex + 1] * 3 + 2];
-
-		triangleBuffer.c.x = vertices[indices[trIndex + 2] * 3 + 0];
-		triangleBuffer.c.y = vertices[indices[trIndex + 2] * 3 + 1];
-		triangleBuffer.c.z = vertices[indices[trIndex + 2] * 3 + 2];*/
 
 	}
 

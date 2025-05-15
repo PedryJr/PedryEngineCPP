@@ -12,6 +12,7 @@ public:
 	void AddComponent(Component* component);
 	void RemoveComponent(Component* component);
 	void Update();
+	void Simulate();
 
 	template<typename T>
 	T* GetComponent()

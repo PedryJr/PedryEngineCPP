@@ -92,16 +92,9 @@ template class ParallelIterator<GLuint>;
 template class ParallelIterator<GLfloat>;
 template class ParallelIterator<GLushort>;
 template class ParallelIterator<GLint64>;
-template class ParallelIterator<Triangle>;
+template class ParallelIterator<WorldTriangle>;
 
 template class ParallelIterator<Component>;
 template class ParallelIterator<Component*>;
 template class ParallelIterator<GameObject>;
 template class ParallelIterator<GameObject*>;
-
-//Engine::vecIterator.setFunction([deltaTime](vec4& value)
-//    {
-//		//ITERATE
-//    });
-//Engine::vecIterator.process(/*Collection start*/, /*Collection size*/);
-//Engine::vecIterator.waitForCompletion();

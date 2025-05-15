@@ -4,7 +4,7 @@
 
 void Engine::Run()
 {
-	
+
 	InitializeEngine();
 
 	while (RenderSystem::ShouldTerminate())
@@ -17,6 +17,7 @@ void Engine::Run()
 
 void Engine::InitializeEngine()
 {
+	Parallel::Init(16);
 	glfwInit();
 
 	timer = TimeNow;
@@ -47,6 +48,7 @@ void Engine::TimelineUpdate()
 	Clock newTimer = TimeNow;
 	deltaTime = Duration(timer, newTimer);
 	timer = newTimer;
+	timeAlive += deltaTime;
 }
 
 void Engine::GraphicsUpdate()
@@ -59,8 +61,10 @@ void Engine::GraphicsUpdate()
 void Engine::GameUpdate()
 {
 	game->Update();
+	Parallel::Wait();
 }
 
 GLdouble Engine::deltaTime = 0.0;
+GLdouble Engine::timeAlive = 0.0;
 
 ParallelIterator<vec4> Engine::vecIterator;

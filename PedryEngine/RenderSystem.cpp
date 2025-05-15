@@ -2,14 +2,15 @@
 
 #include "PedryEngine.h"
 
-RenderSystem::RenderSystem()
+void RenderSystem::Initialize()
 {
-	SetupWindowHints();
 	InitializeMonitor();
-	OpenGLEnableCaps();
+	SetupWindowHints();
 	InitializeWindow();
 	DisplaySettings();
 	Finalize();
+
+	std::cout << "OpenGL version: " << glGetString(GL_VERSION) << std::endl;
 }
 
 void RenderSystem::DrawBatch(DrawCallBatch* batch)
@@ -40,16 +41,27 @@ bool RenderSystem::ShouldTerminate()
 
 void RenderSystem::SetupWindowHints()
 {
-	glfwWindowHint(GLFW_SAMPLES, 0);
+	
+	const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+
+	glfwWindowHint(GLFW_SAMPLES, 2);
+	
+	glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
+	glfwWindowHint(GLFW_CONTEXT_CREATION_API, GLFW_NATIVE_CONTEXT_API);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, 1);
+	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
+
+	// Set the windowed mode hints
 	glfwWindowHint(GLFW_RESIZABLE, 1);
-	glfwWindowHint(GLFW_RED_BITS, 24);
-	glfwWindowHint(GLFW_GREEN_BITS, 24);
-	glfwWindowHint(GLFW_BLUE_BITS, 24);
-	glfwWindowHint(GLFW_ALPHA_BITS, 8);
+	glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, 1);
+
+	//Coor bits
+	glfwWindowHint(GLFW_RED_BITS, mode->redBits);
+	glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
+	glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
+	glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
 
 }
 
@@ -68,16 +80,14 @@ void RenderSystem::OpenGLEnableCaps()
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glDepthFunc(GL_LESS);
-
 	glFrontFace(GL_CCW);
-
 	glDepthMask(GL_TRUE);
 
 }
 
 void RenderSystem::InitializeWindow()
 {
-	window = glfwCreateWindow(width, height, "Pedry Engine", NULL, NULL);
+	window = glfwCreateWindow(width, height, "Pedry Engine", monitor, NULL);
 	glfwMakeContextCurrent(window);
 }
 
@@ -100,20 +110,6 @@ void RenderSystem::Finalize()
 {
 	glClearColor(0.0, 0.0, 0.0, 0.4);
 	glewInit();
-}
-
-RenderSystem::~RenderSystem()
-{
-	glfwTerminate();
-}
-
-void RenderSystem::Initialize()
-{
-	SetupWindowHints();
-	InitializeMonitor();
-	InitializeWindow();
-	DisplaySettings();
-	Finalize();
 }
 
 GLFWwindow* RenderSystem::window = nullptr;

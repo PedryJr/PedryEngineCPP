@@ -11,37 +11,27 @@
 
 #include <immintrin.h>
 
-#include <glm/simd/common.h>
-#include <glm/simd/exponential.h>
-#include <glm/simd/geometric.h>
-#include <glm/simd/integer.h>
-#include <glm/simd/matrix.h>
-#include <glm/simd/neon.h>
-#include <glm/simd/packing.h>
-#include <glm/simd/platform.h>
-#include <glm/simd/trigonometric.h>
-#include <glm/simd/vector_relational.h>
-
-#include <glm/glm.hpp>
-#include <glm/ext.hpp>
-#include <glm/fwd.hpp>
-#include <glm/vec2.hpp>
-#include <glm/vec3.hpp>
-#include <glm/vec4.hpp>
-
-#include <gl/glew.h>
-#include <GLFW/glfw3.h>
 #include <thread>
 #include <string>
 #include <vector>
 #include <functional>
+#include <algorithm>
 #include <cmath>
-
 #include <chrono>
 #include <iostream>
 #include <atomic>
 #include <mutex>
 #include <condition_variable>
+#include <queue>
+#include <deque>
+
+#define GLM_FORCE_INTRINSICS
+#define GLM_FORCE_AVX
+
+#include <glm/glm.hpp>
+#include <glm/ext.hpp>
+#include <gl/glew.h>
+#include <GLFW/glfw3.h>
 
 #include "ufbx.h"
 
@@ -62,6 +52,7 @@
 
 #define INSTANCING_TEST (GLint) 1
 #define DeltaTime Engine::InnerDeltaTime()
+#define TimeAlive Engine::InnerTimeAlive()
 typedef struct stat Stat;
 
 #define vec2 glm::vec2
@@ -70,8 +61,23 @@ typedef struct stat Stat;
 #define quat glm::quat
 #define mat4 glm::mat4
 
-struct Triangle {
-    vec3 a, b, c;
+struct WorldTriangle {
+    mat4 oldMatrix;
+    vec3 localA, localB, localC;
+    vec3 globalA, globalB, globalC;
+    vec3 aabbMin, aabbMax;
+
+    void UpdateForm(const mat4& modelMatrix) 
+    {
+        if (oldMatrix == modelMatrix) return;
+        globalA = modelMatrix * vec4(localA, 1.0f);
+        globalB = modelMatrix * vec4(localB, 1.0f);
+        globalC = modelMatrix * vec4(localC, 1.0f);
+
+        aabbMin = glm::min(globalA, glm::min(globalB, globalC));
+        aabbMax = glm::max(globalA, glm::max(globalB, globalC));
+        oldMatrix = modelMatrix;
+    }
 };
 
 #define vec_UP vec3(0.0F, 1.0F, 0.0F)

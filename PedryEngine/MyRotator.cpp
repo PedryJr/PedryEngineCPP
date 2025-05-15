@@ -3,25 +3,25 @@
 void MyRotator::Initialize()
 {
 	offset = 0;
+	transform->SetScale(vec3(1.5f));
 }
 
 void MyRotator::Simulate()
 {
+
+	timer += DeltaTime;
+
+	timeLine = timer + (2.f * glm::pi<float>() / 8.f * offset);
+
+	xPos = glm::sin(timeLine) * 15.f;
+	zPos = glm::cos(timeLine) * 15.f;
+	xRot = xPos * 360.f / 15.f;
+	zRot = zPos * 360.f / 15.f;
+
 }
 
 void MyRotator::Update()
 {
-
-	timer += DeltaTime / 3;
-
-	float xRot, zRot;
-	float xPos, zPos;
-	float timeLine = timer + offset;
-
-	xRot = glm::sin(timeLine) * 360;
-	zRot = glm::cos(timeLine) * 360;
-	xPos = glm::sin(timeLine) * 5 * glm::sin(timer);
-	zPos = glm::cos(timeLine) * 5 * glm::sin(timer);
 
 	transform->SetRotation(vec3(xRot, 0, zRot));
 	transform->SetPosition(vec3(xPos, 0, zPos));

@@ -55,15 +55,12 @@ void Transform::UpdateModel()
 	mat4 translation = glm::translate(mat4(1.0f), position);
 	mat4 modelMatrix = translation * rotationMatrix * scaleMatrix;
 
-	mat4 view = GlobalCamera::GetViewMatrix();
-
-	mat4 Projection = glm::perspective(glm::radians(45.0f), 16.0f / 9.0f, 0.01f, 100.0f);
-
 	assignedBatch->modelMatrices.data()[modelIndex] = modelMatrix;
 	assignedBatch->shader->SetMat4(rotationMatrix, "rotationMatrix");
-	assignedBatch->shader->SetMat4(Projection * view, "cameraMatrix");
+	assignedBatch->shader->SetMat4(GlobalCamera::projectionMatrix * GlobalCamera::viewMatrix, "cameraMatrix");
 	assignedBatch->shader->SetVec3(vec3(0.0F, 0.0F, 0.0F), "lightPos");
 	assignedBatch->shader->SetVec3(GlobalCamera::aimPosition, "camPos");
+
 }
 
 void Transform::SetModelLocation(DrawCallBatch& assignedBatch, GLint index)

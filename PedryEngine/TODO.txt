@@ -1,0 +1,214 @@
+IMPLEMENT PHYSX OR CUSTOM PHYSICS
+
+
+
+#pragma once
+#include "PedryEngine.h"
+
+
+
+
+bool TrianglesIntersect(const WorldTriangle& t1, const WorldTriangle& t2);
+
+GLfloat lmaoTimer;
+Mesh* mesh;
+Mesh* mesh2;
+Shader* shader;
+GLfloat insaneShit;
+
+GameObject* gameObject;
+GameObject* gameObject2;
+
+bool lastWasColliding = false;
+bool WasColliding = false;
+
+void AssertCollision(bool& a, bool& b)
+{
+    //std::lock_guard<std::mutex> lock(mtx);
+    b = a || b;
+}
+
+void LogLol(bool res) {
+    std::cout << "This log wont run!" << res << std::endl;
+}
+
+
+bool RunSpeedTestST()
+{
+    GLint size = mesh->triangles.size();
+
+    bool stopCheckIfCondition = false;
+
+    mat4 matrixA = gameObject->transform->GetModelMatrix();
+    mat4 matrixB = gameObject2->transform->GetModelMatrix();
+
+    WorldTriangle& cachedTriA = mesh->triangles[0];
+    WorldTriangle& cachedTriB = mesh2->triangles[0];
+
+    size_t size1 = mesh->triangles.size();
+    size_t size2 = mesh2->triangles.size();
+
+    for (size_t i = 0; i < size1; i++)
+    {
+        mesh->triangles[i].UpdateForm(matrixA);
+        for (size_t j = 0; j < size2; j++)
+        {
+
+            mesh2->triangles[i].UpdateForm(matrixB);
+            stopCheckIfCondition = TrianglesIntersect(mesh->triangles[i], mesh2->triangles[i]) || stopCheckIfCondition;
+
+        }
+    }
+
+    return stopCheckIfCondition;
+
+}
+void Game::Start()
+{
+
+    ParallelFor::Init(16);  // Start worker threads
+
+	mesh = AssetManager::LoadMesh("Test");
+	mesh2 = AssetManager::LoadMesh("Test");
+	shader = new Shader(Vert3D, Frag3D);
+	shader->UploadMesh(mesh);
+
+	gameObject = new GameObject();
+	gameObject2 = new GameObject();
+
+    gameObject->transform->SetScale(vec3(0.01f));
+    gameObject2->transform->SetScale(vec3(0.01f));
+
+	gameObject->AddComponent<MyRotator>();
+	gameObject2->AddComponent<MyRotator>()->offset = 2.5f;
+
+
+	DrawCallManager::AddDrawCall(mesh, shader, gameObject->transform);
+	DrawCallManager::AddDrawCall(mesh, shader, gameObject2->transform);
+	//DrawCallManager::RemoveDrawCall(mesh, shader, transform);
+
+    Clock beforeSpeed;
+    Clock afterSpeed;
+    GLfloat period;
+
+    beforeSpeed = TimeNow;
+    RunSpeedTestST();
+    afterSpeed = TimeNow;
+    
+    period = Duration(beforeSpeed, afterSpeed);
+    std::cout << "It took " << period << " seconds to scan the mesh using singlethreading!" << std::endl;
+
+    std::cout << mesh->triangles.size() << std::endl;
+
+    //GLuint textureLocation = AssetManager::LoadTexture("default");
+    //std::cout << textureLocation << std::endl;
+
+}
+
+
+void Game::Update()
+{
+    Clock beforeSpeed;
+    Clock afterSpeed;
+    GLfloat period;
+    beforeSpeed = TimeNow;
+
+    gameObject->Update();
+    gameObject2->Update();
+
+    WasColliding = false;
+
+    for (int i = 0; i < 10000; i++)
+    {
+        ParallelFor::AddTask([&]()
+            {
+                WasColliding = RunSpeedTestST() || WasColliding;
+            });
+    }
+
+    ParallelFor::Wait();
+
+    afterSpeed = TimeNow;
+    period = Duration(beforeSpeed, afterSpeed);
+    if (WasColliding != lastWasColliding) {
+        lastWasColliding = WasColliding;
+        std::cout << "Collision changed to " << (WasColliding ? "TRUE" : "FALSE") << std::endl;
+    }
+
+}
+
+inline float minf(float a, float b) {
+    return b + (a - b) * (a < b); // branchless
+}
+
+inline float maxf(float a, float b) {
+    return a + (b - a) * (a < b); // branchless
+}
+
+inline bool AABBsOverlap(const WorldTriangle& t1, const WorldTriangle& t2) {
+    return !(t1.aabbMax.x < t2.aabbMin.x || t2.aabbMax.x < t1.aabbMin.x ||
+        t1.aabbMax.y < t2.aabbMin.y || t2.aabbMax.y < t1.aabbMin.y ||
+        t1.aabbMax.z < t2.aabbMin.z || t2.aabbMax.z < t1.aabbMin.z);
+}
+
+
+inline bool OverlapOnAxis(const WorldTriangle& t1, const WorldTriangle& t2, const vec3& axis) {
+    if (glm::dot(axis, axis) < 1e-12f) return true; // Skip near-zero axis
+
+    float t1Min, t1Max, t2Min, t2Max;
+
+    // Project triangle 1
+    t1Min = t1Max = glm::dot(axis, t1.globalA);
+    float d = glm::dot(axis, t1.globalB);
+    t1Min = glm::min(t1Min, d);
+    t1Max = glm::max(t1Max, d);
+    d = glm::dot(axis, t1.globalC);
+    t1Min = glm::min(t1Min, d);
+    t1Max = glm::max(t1Max, d);
+
+    // Project triangle 2
+    t2Min = t2Max = glm::dot(axis, t2.globalA);
+    d = glm::dot(axis, t2.globalB);
+    t2Min = glm::min(t2Min, d);
+    t2Max = glm::max(t2Max, d);
+    d = glm::dot(axis, t2.globalC);
+    t2Min = glm::min(t2Min, d);
+    t2Max = glm::max(t2Max, d);
+
+    return !(t1Max < t2Min || t2Max < t1Min);
+}
+
+bool TrianglesIntersect(const WorldTriangle& t1, const WorldTriangle& t2) {
+    //if (AABBsOverlap(t1, t2)) return false;
+    // Precompute edges
+    vec3 e1a = t1.globalB - t1.globalA;
+    vec3 e1b = t1.globalC - t1.globalB;
+    vec3 e1c = t1.globalA - t1.globalC;
+
+    vec3 e2a = t2.globalB - t2.globalA;
+    vec3 e2b = t2.globalC - t2.globalB;
+    vec3 e2c = t2.globalA - t2.globalC;
+
+    vec3 edges1[3] = { e1a, e1b, e1c };
+    vec3 edges2[3] = { e2a, e2b, e2c };
+
+    // Triangle plane normals (can skip normalization)
+    vec3 n1 = glm::cross(e1a, e1b);
+    vec3 n2 = glm::cross(e2a, e2b);
+
+    // Test triangle plane normals
+    if (!OverlapOnAxis(t1, t2, n1)) return false;
+    if (!OverlapOnAxis(t1, t2, n2)) return false;
+
+    // Test cross products of all edge combinations
+    for (int i = 0; i < 3; ++i) {
+        const vec3& edge1 = edges1[i];
+        for (int j = 0; j < 3; ++j) {
+            vec3 axis = glm::cross(edge1, edges2[j]);
+            if (!OverlapOnAxis(t1, t2, axis)) return false;
+        }
+    }
+
+    return true; // No separating axis found
+}
+

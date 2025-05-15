@@ -127,7 +127,6 @@ void Shader::UploadMesh(Mesh* mesh)
     );
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, multiTextureBuffer);
 
-
 }
 
 GLuint Shader::GetProgramID()
@@ -183,35 +182,29 @@ void Shader::SetVec4(const vec4& data, const String& name)
 
 void Shader::CompileShader(String vert, String frag)
 {
-    // Create the shaders
-    GLuint VertexShaderID = glCreateShader(GL_VERTEX_SHADER);
-    if (VertexShaderID == 0) {
-        printf("Error creating vertex shader\n");
-        return;
-    }
 
-    GLuint FragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
-    if (FragmentShaderID == 0) {
-        printf("Error creating fragment shader\n");
-        return;
-    }
+    GLuint VertexShaderID;
+    GLuint FragmentShaderID;
+    char const* VertexSourcePointer;
+    char const* FragmentSourcePointer;
+
+    VertexShaderID = glCreateShader(GL_VERTEX_SHADER);
+    FragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
 
 
-    printf("Vertex shader created\n");
-    char const* VertexSourcePointer = vert.c_str();
+    VertexSourcePointer = vert.c_str();
+    FragmentSourcePointer = frag.c_str();
+
     glShaderSource(VertexShaderID, 1, &VertexSourcePointer, NULL);
     glCompileShader(VertexShaderID);
-
-    char const* FragmentSourcePointer = frag.c_str();
     glShaderSource(FragmentShaderID, 1, &FragmentSourcePointer, NULL);
     glCompileShader(FragmentShaderID);
-    printf("Fragment shader created\n");
 
-    // Link the program
-    printf("Linking program\n");
     programId = glCreateProgram();
+
     glAttachShader(programId, VertexShaderID);
     glAttachShader(programId, FragmentShaderID);
+
     glLinkProgram(programId);
 
     glDetachShader(programId, VertexShaderID);
@@ -221,17 +214,3 @@ void Shader::CompileShader(String vert, String frag)
     glDeleteShader(FragmentShaderID);
 
 }
-
-
-
-//int vertexFileSize;
-//Stat fileStats;
-//FILE* shaderFile;
-//Vector<GLchar> unrolled;
-//
-//vertexFileSize = 0;
-//
-//shaderFile = fopen("dShader.vert", "rb");
-//fstat(fileno(shaderFile), &fileStats);
-//unrolled = Vector<GLchar>(fileStats.st_size);
-//fread(&unrolled[0], sizeof(GLchar), fileStats.st_size, shaderFile);

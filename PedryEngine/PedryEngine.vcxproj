@@ -51,6 +51,7 @@
     <CharacterSet>Unicode</CharacterSet>
     <UseOfMfc>false</UseOfMfc>
     <VCToolsVersion>14.44.35207</VCToolsVersion>
+    <UseDynamicDebugging>false</UseDynamicDebugging>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -101,7 +102,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <LanguageStandard>stdcpp23</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -117,7 +118,7 @@
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
       <Optimization>MaxSpeed</Optimization>
       <CallingConvention>FastCall</CallingConvention>
-      <FloatingPointModel>Fast</FloatingPointModel>
+      <FloatingPointModel>Precise</FloatingPointModel>
       <AdditionalOptions>/NODEFAULTLIB:library</AdditionalOptions>
       <EnableModules>true</EnableModules>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -129,6 +130,8 @@
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
+      <EnableVectorLength>NotSet</EnableVectorLength>
+      <FunctionLevelLinking>false</FunctionLevelLinking>
     </ClCompile>
     <Link>
       <AdditionalDependencies>C:\Program Files (x86)\Windows Kits\10\Lib\10.0.22621.0\um\x64\OpenGL32.Lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -248,6 +251,7 @@
       <FileType>Document</FileType>
     </Text>
     <Text Include="output.txt" />
+    <Text Include="TODO.txt" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="PedryEngine.rc" />

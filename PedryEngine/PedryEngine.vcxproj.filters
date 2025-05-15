@@ -200,5 +200,6 @@
       <Filter>Defaults</Filter>
     </Text>
     <Text Include="output.txt" />
+    <Text Include="TODO.txt" />
   </ItemGroup>
 </Project>

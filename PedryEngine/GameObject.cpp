@@ -49,3 +49,7 @@ void GameObject::Update()
 {
 	for (Component* component : components) component->Update();
 }
+void GameObject::Simulate()
+{
+	for (Component* component : components) component->Simulate();
+}

@@ -12,7 +12,7 @@ public:
 	Vector<GLfloat> tangents;
 	Vector<GLfloat> colors;
 	Vector<GLuint> indices;
-	Vector<Triangle> triangles;
+	Vector<WorldTriangle> triangles;
 
 	GLulong meshId;
 

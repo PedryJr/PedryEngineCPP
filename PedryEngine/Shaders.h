@@ -46,8 +46,9 @@ void main()
 )V0G0N"
 
 #define Vert3D R"V0G0N(
-#version 430 core
-
+#version 460 core
+precision highp float;
+precision highp int;
 layout(location = 0) in vec3 vertexPosition;
 layout(location = 1) in vec3 vertexNormal;
 layout(location = 2) in vec2 vertexUv;
@@ -80,10 +81,11 @@ void main()
 )V0G0N"
 
 #define Frag3D R"V0G0N(
-#version 430 core
+#version 460 core
 
 #extension GL_ARB_bindless_texture : require
-
+precision highp float;
+precision highp int;
 
 layout(binding = 2, std430) readonly buffer ssbo3 {
     sampler2D textures[];
@@ -106,13 +108,14 @@ void main()
 
     sampler2D textureSampler = textures[0];
     vec3 lightColor = vec3(1.0, 1.0, 1.0);
-    float lightDistance = 400;
+    float lightDistance = 1000.0;
     float distanceToLight = distance(FragPos, lightPos);
     lightColor = lightColor / (distanceToLight / lightDistance);
 
-    lightColor = clamp(lightColor, 0, 1);
+    lightColor = clamp(lightColor, 0.0, 1.0);
 
     vec4 texColor = texture(textureSampler, FragCoord);
+    vec3 ambient = vec3(vec4(0.1) * texColor);
 
     vec3 norm = normalize(normalOut);
     vec3 lightDir = normalize(lightPos - FragPos);
@@ -120,13 +123,13 @@ void main()
     vec3 viewDir = normalize(camPos - FragPos);
     vec3 reflectDir = reflect(-lightDir, norm);
 
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 40);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 40.0);
     vec3 specular = specularStrength * spec * lightColor;
 
     float diff = max(dot(norm, lightDir), 0.0);
     vec3 diffuse = diff * lightColor;
-    vec3 result = (diffuse + specular) * vec3(texColor);
-    FragColor = vec4(result, 1.0);
+    vec3 result = (diffuse + (diffuse * specular)) * vec3(texColor);
+    FragColor = vec4(clamp(result + ambient, 0.0, 1.0), 1.0);
 
 
 }

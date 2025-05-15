@@ -3,8 +3,6 @@ class RenderSystem
 {
 
 public:
-	RenderSystem();
-	~RenderSystem();
 
 	static void Initialize();
 
