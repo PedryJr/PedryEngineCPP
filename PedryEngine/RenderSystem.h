@@ -6,7 +6,8 @@ public:
 
 	static void Initialize();
 
-	static void DrawBatch(DrawCallBatch* batch);
+	static void DrawBatchShadow(DrawCallBatch* batch);
+	static void DrawBatchNormal(DrawCallBatch* batch);
 	static void SwapBuffer();
 	static bool ShouldTerminate();
 	static void SetupWindowHints();

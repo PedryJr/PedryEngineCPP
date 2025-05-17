@@ -94,7 +94,7 @@ Mesh::Mesh(ufbx_mesh* loadedMesh, const GLulong& meshId)
 				storedTangents.push_back(tangent.x);
 				storedTangents.push_back(tangent.y);
 				storedTangents.push_back(tangent.z);
-				storedTangents.push_back(0.0F); // handedness
+				storedTangents.push_back(0.01f); // handedness
 			}
 
 			// Assign unique index

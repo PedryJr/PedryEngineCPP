@@ -66,7 +66,7 @@ void Game::Start()
 	gameObject8->AddComponent<MyRotator>()->offset = 7.0f;
 
 	gameFloor = new GameObject();
-	gameFloor->transform->SetPosition(vec3(0.f, -10.f, 0.f));
+	gameFloor->transform->SetPosition(vec3(0.f, -30.f, 0.f));
 	gameFloor->transform->SetScale(vec3(30.f, 5.f, 30.f));
 
 	DrawCallManager::AddDrawCall(mesh, shader, gameObject2->transform);
@@ -78,26 +78,26 @@ void Game::Start()
 	DrawCallManager::AddDrawCall(mesh, shader, gameObject8->transform);
 	DrawCallManager::AddDrawCall(mesh, shader, gameFloor->transform);
 
-	GlobalCamera::aimPositionTarget = vec3(0.f, 10.f, -40.f);
+	GlobalCamera::aimPositionTarget = vec3(0.f, 0.f, -100.f);
 
 }
 
 
 void Game::Update()
 {
-
 	//Example on how i want an observer to iterate on and execute code on all GameObjects. (For my own sanity)
 
 	//Run multithreaded functions, pro tip, dont touch others.
-    Parallel::AddTask([]() {gameObject1->Simulate();});
-    Parallel::AddTask([]() {gameObject2->Simulate();});
-    Parallel::AddTask([]() {gameObject3->Simulate();});
-    Parallel::AddTask([]() {gameObject4->Simulate();});
-    Parallel::AddTask([]() {gameObject5->Simulate();});
-    Parallel::AddTask([]() {gameObject6->Simulate();});
-    Parallel::AddTask([]() {gameObject7->Simulate();});
-    Parallel::AddTask([]() {gameObject8->Simulate();});
-    Parallel::AddTask([]() {gameFloor->Simulate();});
+    gameObject1->Simulate();
+    gameObject2->Simulate();
+    gameObject3->Simulate();
+    gameObject4->Simulate();
+    gameObject5->Simulate();
+    gameObject6->Simulate();
+    gameObject7->Simulate();
+    gameObject8->Simulate();
+    gameFloor->Simulate();
+
 
 	//Run the normal update loop.
 	gameObject1->Update();

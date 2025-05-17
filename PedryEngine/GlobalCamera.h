@@ -16,6 +16,9 @@ public:
 	static mat4 projectionMatrix;
 	static mat4 viewMatrix;
 
+	static GLfloat nearPlane;
+	static GLfloat farPlane;
+
 	static vec2 GetMouseDelta();
 
 	static vec3 GetInputDirection();

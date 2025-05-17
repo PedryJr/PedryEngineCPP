@@ -5,12 +5,23 @@ Vector<DrawCallBatch> DrawCallManager::drawCalls;
 
 void DrawCallManager::ExecuteDrawCalls()
 {
+
+	//glFrontFace(GL_CW);
+	//Shadow mapping pass
 	for (DrawCallBatch& batch : drawCalls)
 	{
-
-		batch.shader->EnsureUseProgram(batch.shader->GetProgramID());
-		RenderSystem::DrawBatch(&batch);
+		batch.shader->EnsureUseProgram(batch.shader->GetShadowID(), batch.shader->GetVertexArrayID());
+		RenderSystem::DrawBatchShadow(&batch);
 	}
+
+	//glFrontFace(GL_CCW);
+	//Normal pass
+	for (DrawCallBatch& batch : drawCalls)
+	{
+		batch.shader->EnsureUseProgram(batch.shader->GetProgramID(), batch.shader->GetVertexArrayID());
+		RenderSystem::DrawBatchNormal(&batch);
+	}
+
 }
 
 void DrawCallManager::AddDrawCall(Mesh* mesh, Shader* shader, Transform* transform)

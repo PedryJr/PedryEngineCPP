@@ -25,8 +25,6 @@
 #include <queue>
 #include <deque>
 
-#define GLM_FORCE_INTRINSICS
-#define GLM_FORCE_AVX
 
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>

@@ -50,15 +50,15 @@ void Transform::UpdateModel()
 
 	if (assignedBatch == nullptr) return;
 
-	mat4 scaleMatrix = glm::transpose(glm::scale(mat4(1.0f), scale));
+	mat4 scaleMatrix = glm::scale(mat4(1.0f), scale);
 	mat4 rotationMatrix = glm::mat4_cast(rotation);
 	mat4 translation = glm::translate(mat4(1.0f), position);
 	mat4 modelMatrix = translation * rotationMatrix * scaleMatrix;
 
 	assignedBatch->modelMatrices.data()[modelIndex] = modelMatrix;
-	assignedBatch->shader->SetMat4(rotationMatrix, "rotationMatrix");
+
 	assignedBatch->shader->SetMat4(GlobalCamera::projectionMatrix * GlobalCamera::viewMatrix, "cameraMatrix");
-	assignedBatch->shader->SetVec3(vec3(0.0F, 0.0F, 0.0F), "lightPos");
+	assignedBatch->shader->SetVec3(Engine::lightPos, "lightPos");
 	assignedBatch->shader->SetVec3(GlobalCamera::aimPosition, "camPos");
 
 }

@@ -11,6 +11,10 @@ public:
 	static FORCE_INLINE GLdouble InnerDeltaTime() { return deltaTime; }
 	static FORCE_INLINE GLdouble InnerTimeAlive() { return timeAlive; }
 
+	static vec3 lightPos;
+	static mat4 lightProjection;
+	static GLfloat lightFarPlane;
+
 private:
 	Clock timer;
 

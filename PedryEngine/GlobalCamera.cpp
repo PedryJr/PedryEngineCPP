@@ -16,6 +16,9 @@ mat4 GlobalCamera::projectionMatrix = mat4(0.0F);
 
 bool GlobalCamera::firstMouse = true;
 
+GLfloat GlobalCamera::nearPlane = 0.1f;
+GLfloat GlobalCamera::farPlane = 2000.0f;
+
 vec2 GlobalCamera::GetMouseDelta()
 {
 
@@ -101,7 +104,7 @@ void GlobalCamera::UpdateInput(GLfloat deltaTime)
 	posToDir = pos + aimDirection;
 
 	viewMatrix = glm::lookAt(pos, posToDir, vec_UP);
-	SetProjection(47.0f, 16.0f / 9.0f, 0.01f, 10000.0f);
+	SetProjection(47.0f, 16.0f / 9.0f, nearPlane, farPlane);
 }
 
 void GlobalCamera::SetProjection(GLfloat vFov, GLfloat aspect, GLfloat near, GLfloat far)

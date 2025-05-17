@@ -24,6 +24,6 @@ void MyRotator::Update()
 {
 
 	transform->SetRotation(vec3(xRot, 0, zRot));
-	transform->SetPosition(vec3(xPos, 0, zPos));
+	transform->SetPosition(vec3(xPos, -20.f, zPos));
 
 }
