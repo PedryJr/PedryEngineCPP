@@ -15,19 +15,21 @@ public:
 	void Simulate();
 
 	template<typename T>
+	requires std::is_base_of_v<Component, T>
 	T* GetComponent()
 	{
 		for (Component* component : components)
 		{
-			if (T* castedComponent = dynamic_cast<T*>(component))
+			if (typeid(*component) == typeid(T))
 			{
-				return castedComponent;
+				return component;
 			}
 		}
 		return nullptr;
 	}
 
 	template<typename T>
+	requires std::is_base_of_v<Component, T>
 	T* AddComponent()
 	{
 		T* component = new T();
@@ -37,6 +39,7 @@ public:
 
 private:
 	
+	GLuint componentCount = 0;
 	Vector<Component*> components;
 
 };

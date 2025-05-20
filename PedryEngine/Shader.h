@@ -1,58 +1,58 @@
 #pragma once
 class Shader
 {
+
 public:
-	Shader();
-	Shader(String vert, String frag);
+	Shader(const String name, const GLulong shaderId);
 	~Shader();
 
 	//Exposed Functions
-	void UploadMesh(Mesh* mesh);
-	void UploadShadowLight();
+	void UploadShadowLight(bool withLightProjection = true) const;
 
-	GLuint GetProgramID();
-	GLuint GetShadowID();
-	GLuint GetVertexArrayID();
-	GLuint GetVertexBuffer();
-	GLuint GetModelBuffer();
+	GLuint GetProgramID() const;
+	Shader& GetShadowShader() const;
 
-	static void EnsureUseProgram(GLuint programId, GLuint vao);
+	GLuint GetModelMatrixBuffer() const;
+	GLuint GetModelMainTextureBuffer() const;
+	GLuint GetModelHeightTextureBuffer() const;
 
-	void SetMat4(const mat4& data, const String& name);
-	void SetInt(const GLint& data, const String& name);
-	void SetGLuint64(const GLuint64& data, const String& name);
-	void SetFloat(const GLfloat& data, const String& name);
-	void SetVec2(const vec2& data, const String& name);
-	void SetVec3(const vec3& data, const String& name);
-	void SetVec4(const vec4& data, const String& name);
+	static void EnsureUseProgram(GLuint programId);
+	static void EnsureUseVAO(GLuint vao);
+	static void EnsureUseModelMatrixBuffer(GLuint modelBuffer);
+	static void EnsureUseModelMainTextureBuffer(GLuint modelBuffer);
+	static void EnsureUseModelHeightTextureBuffer(GLuint modelBuffer);
 
-	const unsigned int SHADOW_WIDTH = 1024 * 2, SHADOW_HEIGHT = 1024 * 2;
-	GLuint depthMapFBO;
-	GLuint depthCubemap;
+	void SetMat4(const mat4& data, const String& name) const;
+	void SetInt(const GLint& data, const String& name) const;
+	void SetGLuint64(const GLuint64& data, const String& name) const;
+	void SetFloat(const GLfloat& data, const String& name) const;
+	void SetVec2(const vec2& data, const String& name) const;
+	void SetVec3(const vec3& data, const String& name) const;
+	void SetVec4(const vec4& data, const String& name) const;
+
+	static unsigned int SHADOW_WIDTH, SHADOW_HEIGHT;
+	static GLuint depthMapFBO;
+	static GLuint depthCubemap;
+	static GLuint64 shadowHandle;
+
+	Shader* shadowShader;
+	GLulong shaderId;
 
 private:
-	//Inner Functions
-	void CompileShader(String vert = Vert3D, String frag = Frag3D);
-	void GenerateBuffers();
 
 	GLuint programId;
 
-	GLuint vertexArrayId;
-	
-	GLuint positionBuffer;
-	GLuint normalBuffer;
-	GLuint uvBuffer;
-	GLuint tangentBuffer;
-
-	GLuint elementBuffer;
-
 	GLuint vertexModelsBuffer;
-
 	GLuint multiTextureBuffer;
+	GLuint modelHeightTextureBuffer;
 
 	static GLuint activeProgram;
+	static GLuint activeVAO;
+	static GLuint activeModelMatrixBuffer;
+	static GLuint activeModelMainTextureBuffer;
+	static GLuint activeModelHeightTextureBuffer;
 
-	GLuint shadowId;
+	//GLuint shadowId;
 
 public:
 	Vector<mat4> shadowTransforms;

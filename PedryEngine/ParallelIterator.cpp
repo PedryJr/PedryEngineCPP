@@ -92,7 +92,6 @@ template class ParallelIterator<GLuint>;
 template class ParallelIterator<GLfloat>;
 template class ParallelIterator<GLushort>;
 template class ParallelIterator<GLint64>;
-template class ParallelIterator<WorldTriangle>;
 
 template class ParallelIterator<Component>;
 template class ParallelIterator<Component*>;

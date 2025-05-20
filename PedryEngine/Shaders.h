@@ -61,6 +61,25 @@ out vec4 FragColor;
 
 float specularStrength = 0.5;
 
+vec3 rgb2hsv(vec3 a) 
+{
+    vec3 c = vec3(a.x, a.z, a.y);
+
+    vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
+    vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g));
+    vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));
+
+    float d = q.x - min(q.w, q.y);
+    float e = 1e-10;
+    return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);
+}
+
+vec3 hsv2rgb(vec3 c) 
+{
+    vec3 p = abs(fract(c.xxx + vec3(0.0, 1.0/3.0, 2.0/3.0)) * 6.0 - 3.0);
+    return c.z * mix(vec3(1.0), clamp(p - 1.0, 0.0, 1.0), c.y);
+}
+
 const vec3 poissonDisk[20] = vec3[](
     vec3( 0.186,  0.512,  0.623), vec3(-0.320,  0.499,  0.521),
     vec3( 0.328, -0.418,  0.703), vec3(-0.285, -0.357,  0.543),
@@ -82,96 +101,110 @@ float rand(vec2 co)
 
 float PCSSS(vec3 fragPos) 
 {
+    vec3 lVec = fragPos - lightPos;
+    float curDepth = length(lVec);
+    vec3 lDir = lVec / curDepth;
+    vec3 norm = normalize(normalOut);
 
-    vec3 normal = normalize(normalOut);
+    float bias = max(0.1 * (1.0 - dot(norm, lDir)), 0.005);
 
-    vec3 fragToLight = fragPos - lightPos;
-    float currentDepth = length(fragToLight);
-    vec3 lightDir = normalize(fragToLight);
-    
-    float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
+    float rnd = rand(fragPos.xy * 10.0) * 6.2831;
+    float s = sin(rnd);
+    float c = cos(rnd);
 
-    float randomAngle = rand(fragPos.xy * 10.0) * 6.2831;
-    mat3 rotationMatrix = mat3(
-        cos(randomAngle), 0, sin(randomAngle),
+    mat3 rot = mat3(
+        c, 0, s,
         0, 1, 0,
-       -sin(randomAngle), 0, cos(randomAngle)
+       -s, 0, c
     );
 
-    float avgBlockerDepth = 0.0;
-    int blockerCount = 0;
-    float searchRadius = 0.05;
+    float avg = 0.0;
+    int cnt = 0;
+    float radius = 0.05;
+
+    vec3 off, samp;
+    float sampDepth;
 
     for (int i = 0; i < 20; ++i) 
     {
-        vec3 offset = rotationMatrix * poissonDisk[i] * searchRadius;
-        float sampleDepth = texture(shadowMap, fragToLight + offset).r * farPlane;
-        if (sampleDepth < currentDepth - bias) 
+        off = rot * poissonDisk[i] * radius;
+        samp = lVec + off;
+        sampDepth = texture(shadowMap, samp).r * farPlane;
+
+        if (sampDepth < curDepth - bias) 
         {
-            avgBlockerDepth += sampleDepth;
-            blockerCount++;
+            avg += sampDepth;
+            cnt++;
         }
     }
 
-    if (blockerCount == 0) return 1.0;
+    if (cnt == 0) return 1.0;
 
-    avgBlockerDepth /= float(blockerCount);
-
-    float penumbraRatio = (currentDepth - avgBlockerDepth) / avgBlockerDepth;
-    float lightSize = 0.5;
-    float filterRadius = clamp(penumbraRatio * lightSize, 0.01, 0.3);
+    avg /= float(cnt);
+    float penumbra = (curDepth - avg) / avg;
+    float filterR = clamp(penumbra * 0.5, 0.01, 0.3);
 
     float shadow = 0.0;
-    for (int i = 0; i < 20; ++i) 
+    for (int i = 0; i < 20; ++i)
     {
-        vec3 offset = rotationMatrix * poissonDisk[i] * filterRadius;
-        float sampleDepth = texture(shadowMap, fragToLight + offset).r * farPlane;
-        if (currentDepth - bias > sampleDepth) shadow += 1.0;
+        off = rot * poissonDisk[i] * filterR;
+        samp = lVec + off;
+        sampDepth = texture(shadowMap, samp).r * farPlane;
+
+        if (curDepth - bias > sampDepth) shadow += 1.0;
     }
 
-    shadow /= 20.0;
-    return 1.0 - shadow;
+    return 1.0 - (shadow * 0.05); // shadow /= 20.0
 }
+
 
 
 vec4 NormalLightImproved()
 {
-    sampler2D textureSampler = textures[0];
-    float ambientStrength = 0.1;
-    vec3 lightColor = vec3(1.0, 1.0, 1.0);
-    vec4 objectColor = texture(textureSampler, FragCoord);
+    sampler2D t = textures[0];
+    vec4 tex = texture(t, FragCoord);
 
     vec3 norm = normalize(normalOut);
-    vec3 lightDir = normalize(lightPos - FragPos);
-    float distance = length(lightPos - FragPos);
+    vec3 lVec = lightPos - FragPos;
+    float dist = length(lVec);
+    vec3 lDir = lVec / dist;
 
-    float falloffDistance = 50.0;
-    
-    float attenuation = clamp(1.0 - distance / falloffDistance, 0.0, 1.0);
+    float atten = 1.0 - dist / 100.0;
+    atten = clamp(atten, 0.0, 1.0);
 
-    float diff = max(dot(norm, lightDir), 0.0);
-    vec3 diffuse = diff * lightColor;
+    float diff = max(dot(norm, lDir), 0.0);
+    vec3 light = vec3(1.0); // white light
 
-    vec3 ambient = ambientStrength * lightColor;
+    vec3 diffLight = diff * light;
 
-    vec3 viewDir = normalize(camPos - FragPos);
-    vec3 reflectDir = reflect(-lightDir, norm);
+    vec3 ambient = 0.1 * light;
 
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
-    vec3 specular = specularStrength * spec * lightColor;
+    vec3 vDir = normalize(camPos - FragPos);
+    vec3 rDir = reflect(-lDir, norm);
 
-    float shadow = PCSSS(FragPos);
+    float spec = pow(max(dot(vDir, rDir), 0.0), 32.0);
+    vec3 specular = specularStrength * spec * light;
 
-    vec3 lighting = ambient + shadow * (diffuse + specular);
+    float shad = PCSSS(FragPos);
 
-    // Apply attenuation to the lighting
-    vec3 result = attenuation * lighting * vec3(objectColor);
+    diffLight = (ambient + shad * (diffLight + specular)) * atten;
 
-    return vec4(result, 1.0);
+    // Reuse tex.rgb as base color, convert to HSV
+    tex.rgb = rgb2hsv(tex.rgb);
+    tex.r *= 1.0; // H stays
+    tex.g *= 1.0; // S stays
+
+    tex.b *= clamp(dot(diffLight, vec3(0.333)), 0.0, 10.0); // apply to V
+    tex.rgb = hsv2rgb(tex.rgb);
+
+    return tex;
 }
 
 void main()
 {
+
+    vec3 hsv = rgb2hsv(vec3(0.0, 0.0, 0.5));
+    vec3 rgb = hsv2rgb(hsv);
 
     FragColor = NormalLightImproved();
 

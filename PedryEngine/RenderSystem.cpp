@@ -4,60 +4,85 @@
 
 void RenderSystem::Initialize()
 {
+
 	InitializeMonitor();
 	SetupWindowHints();
 	InitializeWindow();
 	DisplaySettings();
 	Finalize();
 
-	std::cout << "OpenGL version: " << glGetString(GL_VERSION) << std::endl;
+	std::cout << "Graphics driver: " << "OpenGL - " << glGetString(GL_VERSION) << std::endl;
+	std::cout << "Graphics device: " << glGetString(GL_RENDERER) << std::endl;
+}
+
+void RenderSystem::PrepareShadowPass() 
+{
+	glMakeTextureHandleNonResidentARB(Shader::shadowHandle);
+	glBindFramebuffer(GL_FRAMEBUFFER, Shader::depthMapFBO);
+	glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_NONE);
+	glViewport(0, 0, Shader::SHADOW_WIDTH, Shader::SHADOW_HEIGHT);
+	glClear(GL_DEPTH_BUFFER_BIT);
 }
 
 void RenderSystem::DrawBatchShadow(DrawCallBatch* batch)
 {
-	//std::cout << "OPEN GL ERROR CHECK = " << glGetError() << std::endl;
-	Shader::EnsureUseProgram(batch->shader->GetShadowID(), batch->shader->GetVertexArrayID());
+	//Drawcall data.
+	Shader& shader = *batch->shader->shadowShader;
+	Mesh& mesh = *batch->mesh;
+	mat4* instanceModels = batch->modelMatrices.data();
+	GLuint instanceCount = batch->modelMatrices.size();
+	GLuint elementCount = mesh.indices.size();
 
-	glViewport(0, 0, batch->shader->SHADOW_WIDTH, batch->shader->SHADOW_HEIGHT);
-	glBindFramebuffer(GL_FRAMEBUFFER, batch->shader->depthMapFBO);
-	glClear(GL_DEPTH_BUFFER_BIT);
+	shader.UploadShadowLight(true);
+	Shader::EnsureUseModelMatrixBuffer(shader.GetModelMatrixBuffer());
+	Shader::EnsureUseProgram(shader.GetProgramID());
+	Shader::EnsureUseVAO(mesh.GetVAO());
 
-
-	batch->shader->UploadShadowLight();
-	Shader::EnsureUseProgram(batch->shader->GetShadowID(), batch->shader->GetVertexArrayID());
-
-	glBindBuffer(GL_SHADER_STORAGE_BUFFER, batch->shader->GetModelBuffer());
-	glBufferData(GL_SHADER_STORAGE_BUFFER, batch->modelMatrices.size() * sizeof(mat4), batch->modelMatrices.data(), GL_DYNAMIC_DRAW);
-	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, batch->shader->GetModelBuffer());
+	glBufferData(GL_SHADER_STORAGE_BUFFER, instanceCount * sizeof(mat4), instanceModels, GL_DYNAMIC_DRAW);
 	
-	glDrawElementsInstanced(GL_TRIANGLES, batch->mesh->indices.size(), GL_UNSIGNED_INT, (void*)0, batch->modelMatrices.size());
+	glDrawElementsInstanced(GL_TRIANGLES, elementCount, GL_UNSIGNED_INT, (void*)0, instanceCount);
+}
+
+void RenderSystem::PrepareNormalPass()
+{
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glDrawBuffer(GL_BACK);
+	glReadBuffer(GL_BACK);
+	glViewport(0, 0, width, height);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	Shader::shadowHandle = glGetTextureHandleARB(Shader::depthCubemap);
+	glMakeTextureHandleResidentARB(Shader::shadowHandle);
 
 }
 
 void RenderSystem::DrawBatchNormal(DrawCallBatch* batch)
 {
+	Shader& shader = *batch->shader;
 
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glViewport(0, 0, width, height);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	Shader::EnsureUseProgram(batch->shader->GetProgramID(), batch->shader->GetVertexArrayID());
+	Mesh& mesh = *batch->mesh;
+	mat4* instanceModelsMatrices = batch->modelMatrices.data();
+	GLuint64* instanceModelMainTextures = batch->modelMainTextures.data();
+	GLuint64* instanceModelHeightTextures = batch->modelHeightTextures.data();
+	GLuint instanceCount = batch->modelMatrices.size();
+	GLuint elementCount = mesh.indices.size();
 
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, batch->shader->depthCubemap);
+	shader.UploadShadowLight(false);
+	Shader::EnsureUseProgram(shader.GetProgramID());
+	Shader::EnsureUseVAO(mesh.GetVAO());
 
-	GLuint64 handle = glGetTextureHandleARB(batch->shader->depthCubemap);
-	glMakeTextureHandleResidentARB(handle);
-	batch->shader->SetGLuint64(handle, "shadowMap");
+	Shader::EnsureUseModelMatrixBuffer(shader.GetModelMatrixBuffer());
+	glBufferData(GL_SHADER_STORAGE_BUFFER, instanceCount * sizeof(mat4), instanceModelsMatrices, GL_DYNAMIC_DRAW);
 
-	batch->shader->SetVec3(Engine::lightPos, "lightPos");
-	batch->shader->SetFloat(Engine::lightFarPlane, "farPlane");
-	Shader::EnsureUseProgram(batch->shader->GetProgramID(), batch->shader->GetVertexArrayID());
+	Shader::EnsureUseModelMainTextureBuffer(shader.GetModelMainTextureBuffer());
+	glNamedBufferStorage(shader.GetModelMainTextureBuffer(), sizeof(GLuint64) * instanceCount, (const void*)instanceModelMainTextures, GL_DYNAMIC_STORAGE_BIT);
 
-	glBindBuffer(GL_SHADER_STORAGE_BUFFER, batch->shader->GetModelBuffer());
-	glBufferData(GL_SHADER_STORAGE_BUFFER, batch->modelMatrices.size() * sizeof(mat4), batch->modelMatrices.data(), GL_DYNAMIC_DRAW);
-	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, batch->shader->GetModelBuffer());
+	Shader::EnsureUseModelHeightTextureBuffer(shader.GetModelHeightTextureBuffer());
+	glNamedBufferStorage(shader.GetModelMainTextureBuffer(), sizeof(GLuint64) * instanceCount, (const void*)instanceModelHeightTextures, GL_DYNAMIC_STORAGE_BIT);
 
-	glDrawElementsInstanced(GL_TRIANGLES, batch->mesh->indices.size(), GL_UNSIGNED_INT, (void*)0, batch->modelMatrices.size());
+	glDrawElementsInstanced(GL_TRIANGLES, elementCount, GL_UNSIGNED_INT, (void*)0, instanceCount);
 
 }
 
@@ -77,7 +102,7 @@ void RenderSystem::SetupWindowHints()
 {
 	
 
-	glfwWindowHint(GLFW_SAMPLES, 4);
+	glfwWindowHint(GLFW_SAMPLES, 8);
 	
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
 	glfwWindowHint(GLFW_CONTEXT_CREATION_API, GLFW_NATIVE_CONTEXT_API);
@@ -105,8 +130,6 @@ void RenderSystem::OpenGLEnableCaps()
 	glEnable(GL_CULL_FACE);
 
 	glDepthFunc(GL_LESS);
-	glDepthRange(0.0f, 1.0f);
-	glCullFace(GL_BACK);
 }
 
 void RenderSystem::InitializeWindow()

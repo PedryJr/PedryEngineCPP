@@ -6,39 +6,33 @@ Vector<DrawCallBatch> DrawCallManager::drawCalls;
 void DrawCallManager::ExecuteDrawCalls()
 {
 
-	//glFrontFace(GL_CW);
-	//Shadow mapping pass
-	for (DrawCallBatch& batch : drawCalls)
-	{
-		batch.shader->EnsureUseProgram(batch.shader->GetShadowID(), batch.shader->GetVertexArrayID());
-		RenderSystem::DrawBatchShadow(&batch);
-	}
+	RenderSystem::PrepareShadowPass();
+	for (DrawCallBatch& batch : drawCalls) RenderSystem::DrawBatchShadow(&batch);
 
-	//glFrontFace(GL_CCW);
-	//Normal pass
-	for (DrawCallBatch& batch : drawCalls)
-	{
-		batch.shader->EnsureUseProgram(batch.shader->GetProgramID(), batch.shader->GetVertexArrayID());
-		RenderSystem::DrawBatchNormal(&batch);
-	}
+	RenderSystem::PrepareNormalPass();
+	for (DrawCallBatch& batch : drawCalls) RenderSystem::DrawBatchNormal(&batch);
 
 }
 
 void DrawCallManager::AddDrawCall(Mesh* mesh, Shader* shader, Transform* transform)
 {
 
-	for (DrawCallBatch& batch : drawCalls)
+	transform->outerLocation = &drawCalls;
+
+	for (GLint batchIndex = 0; batchIndex < drawCalls.size(); batchIndex++) 
 	{
 
-		if (!(batch.mesh->meshId == mesh->meshId)) continue;
-		batch.AddBatchInstance(*transform);
-		return;
+		DrawCallBatch& batch = drawCalls.at(batchIndex);
 
+		if ((batch.mesh->meshId == mesh->meshId) && (batch.shader->shaderId == shader->shaderId))
+		{
+			batch.AddBatchInstance(*transform, batchIndex);
+			return;
+		}
 	}
 
 	drawCalls.emplace_back(shader, mesh);
-	drawCalls.back().AddBatchInstance(*transform);
-
+	drawCalls.back().AddBatchInstance(*transform, drawCalls.size() - 1);
 
 }
 

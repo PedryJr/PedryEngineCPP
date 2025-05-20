@@ -10,7 +10,9 @@
 #endif
 
 #include <immintrin.h>
-
+#include <fstream>
+#include <sstream>
+#include <iostream>
 #include <thread>
 #include <string>
 #include <vector>
@@ -18,7 +20,6 @@
 #include <algorithm>
 #include <cmath>
 #include <chrono>
-#include <iostream>
 #include <atomic>
 #include <mutex>
 #include <condition_variable>
@@ -58,6 +59,20 @@ typedef struct stat Stat;
 #define vec4 glm::vec4
 #define quat glm::quat
 #define mat4 glm::mat4
+
+#define ReadFileToString(path, outStr, resultBool)                 \
+    {                                                              \
+        std::ifstream f(path);                                     \
+        if (!f.is_open()) resultBool = false;                      \
+        else {                                                     \
+            std::ostringstream s;                                  \
+            s << f.rdbuf();                                        \
+            outStr = s.str();                                      \
+            resultBool = true;                                     \
+        }                                                          \
+    }
+
+
 
 struct WorldTriangle {
     mat4 oldMatrix;

@@ -27,6 +27,7 @@ void GameObject::AddComponent(Component* component)
 		if (existingComponent == component) return;
 	}
 	components.push_back(component);
+	componentCount++;
 	component->transform = transform;
 	component->gameObject = this;
 	component->Initialize();
@@ -42,14 +43,15 @@ void GameObject::RemoveComponent(Component* component)
 	{
 		component->~Component();
 		components.erase(it, components.end());
+		componentCount--;
 	}
 }
 
 void GameObject::Update()
 {
-	for (Component* component : components) component->Update();
+	for (int i = 0; i < componentCount; i++) components[i]->Update();
 }
 void GameObject::Simulate()
 {
-	for (Component* component : components) component->Simulate();
+	for (int i = 0; i < componentCount; i++) components[i]->Simulate();
 }

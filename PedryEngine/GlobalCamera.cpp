@@ -17,7 +17,7 @@ mat4 GlobalCamera::projectionMatrix = mat4(0.0F);
 bool GlobalCamera::firstMouse = true;
 
 GLfloat GlobalCamera::nearPlane = 0.1f;
-GLfloat GlobalCamera::farPlane = 2000.0f;
+GLfloat GlobalCamera::farPlane = 1000.0f;
 
 vec2 GlobalCamera::GetMouseDelta()
 {

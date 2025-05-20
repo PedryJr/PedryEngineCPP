@@ -9,7 +9,7 @@ void MyRotator::Initialize()
 void MyRotator::Simulate()
 {
 
-	timer += DeltaTime;
+	timer += DeltaTime / 5;
 
 	timeLine = timer + (2.f * glm::pi<float>() / 8.f * offset);
 
@@ -24,6 +24,6 @@ void MyRotator::Update()
 {
 
 	transform->SetRotation(vec3(xRot, 0, zRot));
-	transform->SetPosition(vec3(xPos, -20.f, zPos));
+	transform->SetPosition(vec3(xPos, -30.f, zPos));
 
 }

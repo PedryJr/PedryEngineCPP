@@ -6,7 +6,10 @@ public:
 
 	static void Initialize();
 
+	static void UploadGpuData(DrawCallBatch* batch);
+	static void PrepareShadowPass();
 	static void DrawBatchShadow(DrawCallBatch* batch);
+	static void PrepareNormalPass();
 	static void DrawBatchNormal(DrawCallBatch* batch);
 	static void SwapBuffer();
 	static bool ShouldTerminate();
