@@ -1,5 +1,7 @@
 #pragma once
+class MyMover;
 class MyRotator;
+class StareAtPlayerComp;
 class Transform;
 class RenderSystem;
 class Mesh;
@@ -10,9 +12,11 @@ class DrawCallBatch;
 class DrawCallManager;
 class AssetManager;
 class Shader;
+class Texture;
 class PengTranspiler;
 class Engine;
 class PedryMath;
 class ShaderManager;
 class Renderer;
 class Game;
+class ComponentHandle;

@@ -67,6 +67,10 @@
   <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Bruh|x64'">
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <VCToolsVersion>14.44.35207</VCToolsVersion>
+    <EnableASAN>false</EnableASAN>
+    <DCompiler>None</DCompiler>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -114,6 +118,9 @@
     <CopyLocalDebugSymbols>false</CopyLocalDebugSymbols>
     <UseStructuredOutput>false</UseStructuredOutput>
     <RunCodeAnalysis>false</RunCodeAnalysis>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Bruh|x64'">
+    <UseStructuredOutput>false</UseStructuredOutput>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -219,10 +226,29 @@
       <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
-      <Optimization>MaxSpeed</Optimization>
+      <Optimization>Full</Optimization>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <OmitFramePointers>true</OmitFramePointers>
+      <EnableVectorLength>NotSet</EnableVectorLength>
+      <FloatingPointExceptions>false</FloatingPointExceptions>
+      <CallingConvention>FastCall</CallingConvention>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
+      <TranslateIncludes>false</TranslateIncludes>
+      <IntelJCCErratum>false</IntelJCCErratum>
+      <GuardEHContMetadata>false</GuardEHContMetadata>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <StringPooling>true</StringPooling>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>C:\Program Files (x86)\Windows Kits\10\Lib\10.0.22621.0\um\x64\OpenGL32.Lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>C:\Program Files (x86)\Windows Kits\10\Lib\10.0.22621.0\um\x64\OpenGL32.Lib;C:\Users\emild\Skrivebord\Advanced\PedryEngine\src\*;%(AdditionalDependencies)</AdditionalDependencies>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+      <StackCommitSize>
+      </StackCommitSize>
+      <StackReserveSize>
+      </StackReserveSize>
+      <SubSystem>NotSet</SubSystem>
     </Link>
     <PostBuildEvent>
       <Command>xcopy "$(ProjectDir)Assets" "$(OutDir)Assets" /E /I /Y</Command>
@@ -231,14 +257,17 @@
   <ItemGroup>
     <ClInclude Include="AssetManager.h" />
     <ClInclude Include="Component.h" />
+    <ClInclude Include="ComponentHandle.h" />
     <ClInclude Include="DrawCallBatch.h" />
     <ClInclude Include="DrawCallManager.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameObject.h" />
+    <ClInclude Include="GameObjectHandle.h" />
     <ClInclude Include="GlobalCamera.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="Engine.h" />
     <ClInclude Include="Mesh.h" />
+    <ClInclude Include="MyMover.h" />
     <ClInclude Include="MyRotator.h" />
     <ClInclude Include="ParallelIterator.h" />
     <ClInclude Include="PedryEngine.h" />
@@ -248,7 +277,10 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="ShaderManager.h" />
     <ClInclude Include="Shaders.h" />
+    <ClInclude Include="StareAtPlayerComp.h" />
     <ClInclude Include="stb_image.h" />
+    <ClInclude Include="Texture.h" />
+    <ClInclude Include="ThreadPool.h" />
     <ClInclude Include="Transform.h" />
     <ClInclude Include="TypeDeclare.h" />
     <ClInclude Include="ufbx.h" />
@@ -258,26 +290,33 @@
   <ItemGroup>
     <ClCompile Include="AssetManager.cpp" />
     <ClCompile Include="Component.cpp" />
+    <ClCompile Include="ComponentHandle.cpp" />
     <ClCompile Include="DrawCallBatch.cpp" />
     <ClCompile Include="DrawCallManager.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameObject.cpp" />
+    <ClCompile Include="GameObjectHandle.cpp" />
     <ClCompile Include="GlobalCamera.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Engine.cpp" />
     <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="MyMover.cpp" />
     <ClCompile Include="MyRotator.cpp" />
     <ClCompile Include="ParallelIterator.cpp" />
     <ClCompile Include="PedryMath.cpp" />
     <ClCompile Include="PengTranspiler.cpp" />
     <ClCompile Include="RenderSystem.cpp" />
     <ClCompile Include="ShaderManager.cpp" />
+    <ClCompile Include="StareAtPlayerComp.cpp" />
+    <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="ThreadPool.cpp" />
     <ClCompile Include="Transform.cpp" />
     <ClCompile Include="ufbx.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Shader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="cpp.hint" />
     <None Include="packages.config" />
     <None Include="PengShader.peng" />
     <Text Include="Dshader.frag">

@@ -1,183 +1,139 @@
 #pragma once
-
 #include "PedryEngine.h"
+
+#define outerLocation DrawCallManager::drawCalls
+
+#define model outerLocation[batchIndex].gameSwizzle->modelMatrices[modelIndex]
+
+
+Transform::Transform()
+{
+	
+}
+
+//Transform::Transform(Transform&& other)
+//{
+//	useContigousArray = other.useContigousArray;
+//	position = other.position;
+//	rotation = other.rotation;
+//	scale = other.scale;
+//	shouldUpdateTransform = other.shouldUpdateTransform;
+//	batchIndex = other.batchIndex;
+//	modelIndex = other.modelIndex;
+//}
+
+Transform& Transform::operator=(const Transform& other) = default;
 
 void Transform::Initialize()
 {
-	position = vec3(0.0f, 0.0f, 0.0f);
-	scale = vec3(1.0f, 1.0f, 1.0f);
-	this->rotation = mat4(1.0f);
+	this->SetScale(1.f, 1.f, 1.f);
+	this->SetPosition(0.f, 0.f, 0.f);
+	this->SetRotation(0.f, 0.f, 0.f);
 }
 
-void Transform::Simulate()
+void __vectorcall Transform::Simulate()
 {
+	if (!shouldUpdateTransform) return;
+	modelMatrix =
+		glm::translate(identityMatrix, position) *
+		glm::mat4_cast(rotation) *
+		glm::scale(identityMatrix, scale);
+
+	if (useContigousArray) model = modelMatrix;
 }
 
 void Transform::Update()
 {
-	UpdateModel();
 }
 
-void Transform::SetPosition(const vec3 position)
+FORCE_INLINE void Transform::SetPosition(const vec3 position)
 { 
 	shouldUpdateTransform = true;
 	this->position = { position };
 }
 
-void Transform::SetPosition(const float x, const float y, const float z)
+void Transform::SetPosition(const GLfloat x, const GLfloat y, const GLfloat z)
 {
-	shouldUpdateTransform = true;
-	this->position = { x, y, z };
+	SetPosition(vec3(x, y, z));
 }
 
-void Transform::SetPosition(const float scalar)
+void Transform::SetPosition(const GLfloat scalar)
 {
-	shouldUpdateTransform = true;
-	this->position = { scalar, scalar, scalar };
+	SetPosition(vec3(scalar, scalar, scalar));
 }
 
-void Transform::AddPosition(const vec3 position)
+FORCE_INLINE void Transform::AddPosition(const vec3 position)
 {
 	shouldUpdateTransform = true;
 	this->position = { this->position + position };
 }
 
-void Transform::AddPosition(const float x, const float y, const float z)
+void Transform::AddPosition(const GLfloat x, const GLfloat y, const GLfloat z)
 {
-	shouldUpdateTransform = true;
-	this->position = { (this->position) + (x, y, z) };
+	AddPosition(vec3(x, y, z));
 }
 
-void Transform::AddPosition(const float scalar)
+void Transform::AddPosition(const GLfloat scalar)
 {
-	shouldUpdateTransform = true;
-	this->position = { this->position + vec3(scalar, scalar, scalar) };
+	AddPosition(vec3(scalar, scalar, scalar));
 }
 
-void Transform::SetScale(const vec3 scale)
+FORCE_INLINE void Transform::SetScale(const vec3 scale)
 {
 	shouldUpdateTransform = true;
 	this->scale = { scale };
 }
 
-void Transform::SetScale(const float x, const float y, const float z)
+void Transform::SetScale(const GLfloat x, const GLfloat y, const GLfloat z)
 {
-	shouldUpdateTransform = true;
-	this->scale = { x, y, z };
+	SetScale(vec3(x, y, z));
 }
 
-void Transform::SetScale(const float scale)
+void Transform::SetScale(const GLfloat scale)
 {
-	shouldUpdateTransform = true;
-	this->scale = { scale, scale, scale };
+	SetScale(vec3(scale, scale, scale));
 }
 
-void Transform::AddScale(const vec3 scale)
+FORCE_INLINE void Transform::AddScale(const vec3 scale)
 {
 	shouldUpdateTransform = true;
 	this->scale = { this->scale + scale };
 }
 
-void Transform::AddScale(const float x, const float y, const float z)
+void Transform::AddScale(const GLfloat x, const GLfloat y, const GLfloat z)
 {
-	shouldUpdateTransform = true;
-	this->scale = { this->scale + vec3(x, y, z) };
+	AddScale(vec3(x, y, z));
 }
 
-void Transform::AddScale(const float scale)
+void Transform::AddScale(const GLfloat scale)
 {
-	shouldUpdateTransform = true;
-	this->scale = { this->scale + vec3(scale, scale, scale) };
+	AddScale(vec3(scale, scale, scale));
 }
 
-void Transform::SetRotation(const quat rotation)
+FORCE_INLINE void Transform::SetRotation(const quat rotation)
 {
 	shouldUpdateTransform = true;
 	this->rotation = { rotation };
 }
 
-void Transform::SetRotation(const float x, const float y, const float z)
+void Transform::SetRotation(const GLfloat x, const GLfloat y, const GLfloat z)
 {
-	shouldUpdateTransform = true;
-	this->rotation = glm::qua(glm::radians(vec3(x, y, z)));
+	SetRotation(glm::qua(glm::radians(vec3(x, y, z))));
 }
 
 void Transform::SetRotation(const vec3 euler)
 {
-	shouldUpdateTransform = true;
-	this->rotation = glm::qua(glm::radians(euler)); 
+	SetRotation(glm::qua(glm::radians(euler)));
 }
 
-void Transform::SetRotation(const float x, const float y, const float z, const float w)
+void Transform::SetRotation(const GLfloat x, const GLfloat y, const GLfloat z, const GLfloat w)
 {
-	shouldUpdateTransform = true;
-	this->rotation = { x, y, z, w };
+	SetRotation(glm::qua(x, y, z, w));
 }
 
-void Transform::AddRotation(const quat rotation)
+void  Transform::SetRotation(const GLfloat angle, const vec3 axis)
 {
-	shouldUpdateTransform = true;
-	this->rotation = { this->rotation * rotation };
-}
-
-void Transform::AddRotation(const float x, const float y, const float z)
-{
-	shouldUpdateTransform = true;
-	this->rotation = { this->rotation * glm::qua(glm::radians(vec3(x, y, z))) };
-}
-
-void Transform::AddRotation(const vec3 euler)
-{
-	shouldUpdateTransform = true;
-	this->rotation = { this->rotation * glm::qua(glm::radians(euler)) };
-}
-
-void Transform::AddRotation(const float x, const float y, const float z, const float w)
-{
-	shouldUpdateTransform = true;
-	this->rotation = { this->rotation * quat(x, y, z, w) };
-}
-
-void Transform::AddRotation(const float angle, const vec3 axis)
-{
-	shouldUpdateTransform = true;
-	this->rotation = { this->rotation * glm::qua(glm::radians(angle), axis) };
-}
-
-void Transform::SetRotation(const float angle, const vec3 axis)
-{
-	shouldUpdateTransform = true;
-	this->rotation = { glm::qua(glm::radians(angle), axis) };
-}
-
-void Transform::SetModelIndex(GLuint modelIndex)
-{
-	shouldUpdateTransform = true;
-	this->modelIndex = modelIndex;
-}
-
-GLuint Transform::GetModelIndex()
-{
-	return modelIndex;
-}
-
-mat4 Transform::GetModelMatrix()
-{
-	return modelMatrix;
-}
-
-void Transform::UpdateModel()
-{
-	if (!shouldUpdateTransform) return;
-	scaleMatrix = glm::scale(mat4(1.0f), scale);
-	rotationMatrix = glm::mat4_cast(rotation);
-	translation = glm::translate(mat4(1.0f), position);
-	modelMatrix = translation * rotationMatrix * scaleMatrix;
-
-	if (modelIndex == -1) return;
-	outerLocation->at(batchIndex).modelMatrices.data()[modelIndex] = modelMatrix;
-	shouldUpdateTransform = false;
-
+	SetRotation(glm::qua(glm::radians(angle), axis));
 }
 
 void Transform::SetModelLocation(GLint modelIndex, GLint batchIndex)
@@ -185,3 +141,13 @@ void Transform::SetModelLocation(GLint modelIndex, GLint batchIndex)
 	this->modelIndex = modelIndex;
 	this->batchIndex = batchIndex;
 }
+
+Vector<DrawCallBatch>& Transform::GetOuterLocation()
+{
+	return outerLocation;
+}
+
+void Transform::Demolish()
+{
+}
+GENERATED_ACTION(Transform)

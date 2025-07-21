@@ -25,10 +25,18 @@
 #include <condition_variable>
 #include <queue>
 #include <deque>
+#include <future>
+#include <stdexcept>
+#include <typeinfo>
 
+#define GLM_FORCE_INTRINSICS
+#define GLM_FORCE_SIMD_AVX2 // or SSE2, SSE4_1, etc., depending on target
 
-#include <glm/glm.hpp>
-#include <glm/ext.hpp>
+#include <glm/glm.hpp>                  // Core types: vec2, vec3, vec4, mat4, etc.
+#include <glm/gtc/quaternion.hpp>       // Quaternions
+#include <glm/gtc/matrix_transform.hpp> // Transform functions
+#include <glm/gtc/type_ptr.hpp>         // Conversion to/from raw pointers
+
 #include <gl/glew.h>
 #include <GLFW/glfw3.h>
 
@@ -99,10 +107,69 @@ struct WorldTriangle {
 
 #define Log(output) std::cout << output << std::endl
 
+#define LogGL()\
+{\
+    switch (glGetError())\
+    {\
+    case GL_NO_ERROR:          Log("No Error"); break;\
+    case GL_INVALID_ENUM:      Log("Invalid Enum"); break;\
+    case GL_INVALID_VALUE:     Log("Invalid Value"); break;\
+    case GL_INVALID_OPERATION: Log("Invalid Operation"); break;\
+    case GL_INVALID_FRAMEBUFFER_OPERATION: Log("Invalid Framebuffer Operation"); break;\
+    case GL_OUT_OF_MEMORY:     Log("Out of Memory"); break;\
+    case GL_STACK_UNDERFLOW:   Log("Stack Underflow"); break;\
+    case GL_STACK_OVERFLOW:    Log("Stack Overflow"); break;\
+    case GL_CONTEXT_LOST:      Log("Context Lost"); break;\
+    default:                   Log("Unknown Error");\
+    }\
+}
+
+#define GENERATED_CLASS(ComponentType) \
+template class ParallelIterator<ComponentType>;
+
+#define GENERATED_ACTION(ComponentType)                                     \
+Vector<ComponentType> ComponentType::componentArray;                        \
+GLuint ComponentType::type = typeid(ComponentType).hash_code(); \
+ParallelIterator<ComponentType> ComponentType::compIterator = ParallelIterator<ComponentType>();
+
+#define GENERATED_BODY(ComponentType)                                       \
+public:                                                                     \
+    static ParallelIterator<ComponentType> compIterator;                    \
+    static GLuint type;                                                     \
+    static Vector<ComponentType> componentArray;                            \
+    static void ProcessAll() {                                              \
+        compIterator.process(componentArray.data(), componentArray.size());\
+    }                                                                       \
+    static void UpdateAll() {                                                   \
+                                                                            \
+        for (auto& comp : componentArray) comp.Update();                    \
+    }                                                                           \
+    static void WaitAll() {                                                   \
+                                                                            \
+        compIterator.waitForCompletion();                                      \
+    }                                                                           \
+    static void CompInit()                                                      \
+    {                                                                           \
+                                                                                \
+        compIterator.setFunction([](ComponentType& comp, const GLint index) \
+            {                                                                       \
+                comp.Simulate();                                                    \
+            } );                                                                    \
+        GLuint ecsGhost = componentArray.size();                                   \
+        componentArray.emplace_back();                                          \
+        componentArray[ecsGhost].ecsGhost = ecsGhost;                          \
+    }
+
 #include "TypeDeclare.h"
 
+#include "ComponentHandle.h"
+#include "GameObjectHandle.h"
+#include "ParallelIterator.h"
+#include "ThreadPool.h"
+#include "Texture.h"
 #include "Shaders.h"
 #include "Component.h"
+#include "MyMover.h"
 #include "Renderer.h"
 #include "Mesh.h"
 #include "Shader.h"
@@ -112,7 +179,6 @@ struct WorldTriangle {
 #include "AssetManager.h"
 #include "GameObject.h"
 #include "PedryMath.h"
-#include "ParallelIterator.h"
 #include "RenderSystem.h"
 #include "GlobalCamera.h"
 #include "main.h"
@@ -121,3 +187,10 @@ struct WorldTriangle {
 #include "ShaderManager.h"
 #include "Game.h"
 #include "MyRotator.h"
+#include "StareAtPlayerComp.h"
+
+template<typename T>
+T& ComponentHandle::GetComponent()
+{
+    return T::componentArray[compIndex];
+}

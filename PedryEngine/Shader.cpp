@@ -9,6 +9,12 @@ GLuint64 Shader::shadowHandle = -1;
 unsigned int Shader::SHADOW_WIDTH = 1024;
 unsigned int Shader::SHADOW_HEIGHT = 1024;
 
+GLuint Shader::activeProgram = -1;
+GLuint Shader::activeVAO = -1;
+GLuint Shader::activeModelMatrixBuffer = -1;
+GLuint Shader::activeModelMainTextureBuffer = -1;
+GLuint Shader::activeModelHeightTextureBuffer = -1;
+
 Shader::~Shader()
 {
 }
@@ -68,11 +74,6 @@ GLuint Shader::GetModelHeightTextureBuffer() const
     return modelHeightTextureBuffer;
 }
 
-GLuint Shader::activeProgram = -1;
-GLuint Shader::activeVAO = -1;
-GLuint Shader::activeModelMatrixBuffer = -1;
-GLuint Shader::activeModelMainTextureBuffer = -1;
-GLuint Shader::activeModelHeightTextureBuffer = -1;
 void Shader::EnsureUseProgram(GLuint pid)
 {
 	if (activeProgram != pid)
@@ -96,9 +97,9 @@ void Shader::EnsureUseModelMatrixBuffer(GLuint modelBuffer)
     if(activeModelMatrixBuffer != modelBuffer)
     {
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, modelBuffer);
-        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, modelBuffer);
 		activeModelMatrixBuffer = modelBuffer;
     }
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, modelBuffer);
 }
 
 void Shader::EnsureUseModelMainTextureBuffer(GLuint modelBuffer)
@@ -106,9 +107,9 @@ void Shader::EnsureUseModelMainTextureBuffer(GLuint modelBuffer)
     if (activeModelMainTextureBuffer != modelBuffer)
     {
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, modelBuffer);
-        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, modelBuffer);
         activeModelMainTextureBuffer = modelBuffer;
     }
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, modelBuffer);
 }
 
 void Shader::EnsureUseModelHeightTextureBuffer(GLuint modelBuffer)
@@ -116,9 +117,9 @@ void Shader::EnsureUseModelHeightTextureBuffer(GLuint modelBuffer)
     if (activeModelHeightTextureBuffer != modelBuffer)
     {
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, modelBuffer);
-        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, modelBuffer);
         activeModelHeightTextureBuffer = modelBuffer;
     }
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, modelBuffer);
 }
 
 void Shader::SetMat4(const mat4& data, const String& name) const
@@ -175,7 +176,7 @@ void CheckShaderError(const GLuint shaderID, const GLenum type) {
 Shader::Shader(const String name, const GLulong shaderId)
 {
 
-	this->shaderId = shaderId;
+	this->shaderAssetId = shaderId;
 	this->shadowShader = nullptr;
     
     bool vert, geom, tesc, tese, frag;
@@ -301,19 +302,6 @@ Shader::Shader(const String name, const GLulong shaderId)
     glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
     glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depthCubemap, 0);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    //Vector<GLuint64> textureHandles;
-    //textureHandles.push_back(AssetManager::LoadTexture("default"));
-
-    //glBindBuffer(GL_SHADER_STORAGE_BUFFER, multiTextureBuffer);
-    //glNamedBufferStorage(
-    //    multiTextureBuffer,
-    //    sizeof(GLuint64) * textureHandles.size(),
-    //    (const void*)textureHandles.data(),
-    //    GL_DYNAMIC_STORAGE_BIT
-    //);
-
-    //glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, multiTextureBuffer);
 
 }
 

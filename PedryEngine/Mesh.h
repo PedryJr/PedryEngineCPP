@@ -21,7 +21,7 @@ public:
 	GLuint GetElementBuffer();
 
 	void UpdateGpuStorage();
-	GLulong meshId;
+	GLulong meshAssetId;
 private:
 	GLuint vertexArrayId;
 	GLuint positionBuffer;

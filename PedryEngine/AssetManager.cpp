@@ -7,10 +7,10 @@
 std::unordered_map<GLulong, Mesh*> AssetManager::meshCache;
 std::unordered_map<GLulong, Shader*> AssetManager::shaderCache;
 std::unordered_map<GLulong, GLuint64> AssetManager::textureCache;
+std::unordered_map<GLulong, Texture*> AssetManager::newTextureCache;
 
 Mesh* AssetManager::LoadMesh(const String& meshName)
 {
-
 	GLulong meshId = NameToId(meshName);
 
 	Mesh* mesh = GetMeshFromCache(meshId);
@@ -37,7 +37,7 @@ Mesh* AssetManager::LoadMesh(const String& meshName)
 	logOutput += " vertices and ";
 	logOutput += ToString(mesh->indices.size());
 	logOutput += " indices with the meshId of ";
-	logOutput += ToString(mesh->meshId);
+	logOutput += ToString(mesh->meshAssetId);
 	logOutput += ".";
 	Log(logOutput);
 
@@ -49,13 +49,13 @@ Mesh* AssetManager::LoadMesh(const String& meshName)
 
 GLuint64 AssetManager::LoadTexture(const String& textureName)
 {
-
 	GLulong textureId = NameToId(textureName);
 
 	//TODO: CHANGE TO TEXTURE CLASS FOR CLEANUP
-	GLuint64 texture = GetTextureFromCache(textureId);
-
-	if (texture != -1) return texture;
+	GLuint64 texture;
+	bool exists = GetTextureFromCache(textureId, texture);
+	//LogGL();
+	if (exists) return texture;
 
 	String texturePath = "Assets/" + textureName + ".png";
 	int w, h, channels;
@@ -66,7 +66,7 @@ GLuint64 AssetManager::LoadTexture(const String& textureName)
 	}
 	GLuint tex;
 	glCreateTextures(GL_TEXTURE_2D, 1, &tex);
-	glTextureStorage2D(tex, 1, GL_RGBA32F, w, h);
+	glTextureStorage2D(tex, 1, GL_RGBA8, w, h);
 	glTextureSubImage2D(tex, 0, 0, 0, w, h, GL_RGBA, GL_UNSIGNED_BYTE, img);
 	glTextureParameteri(tex, GL_TEXTURE_MIN_FILTER, GL_POINT);
 	glTextureParameteri(tex, GL_TEXTURE_MAG_FILTER, GL_POINT);
@@ -75,9 +75,35 @@ GLuint64 AssetManager::LoadTexture(const String& textureName)
 	GLuint64 handle = glGetTextureHandleARB(tex);
 	glMakeTextureHandleResidentARB(handle);
 
+	String logOutput = textureName;
+	logOutput += " texture loaded with the textureId of ";
+	logOutput += ToString(textureId);
+	logOutput += ".";
+	Log(logOutput);
 	AddTextureToCache(textureId, handle);
 
 	return handle;
+}
+
+Texture* AssetManager::NewLoadTexture(const String& textureName)
+{
+
+	GLulong textureId = NameToId(textureName);
+
+	//TODO: CHANGE TO TEXTURE CLASS FOR CLEANUP
+	Texture* texture = GetNewTextureFromCache(textureId);
+
+	LogGL();
+	if (texture) return texture;
+
+	String logOutput = textureName;
+	logOutput += " texture loaded with the textureId of ";
+	logOutput += ToString(textureId);
+	logOutput += ".";
+	Log(logOutput);
+	AddNewTextureToCache(textureId, texture);
+
+	return texture;
 }
 
 Shader* AssetManager::LoadShader(const String& shaderName)
@@ -95,7 +121,7 @@ Shader* AssetManager::LoadShader(const String& shaderName)
 	
 	String logOutput = shaderName;
 	logOutput += " shader loaded with the shaderId of ";
-	logOutput += ToString(shader->shaderId);
+	logOutput += ToString(shader->shaderAssetId);
 	logOutput += ".";
 	Log(logOutput);
 	AddShaderToCache(shaderId, shader);
@@ -126,24 +152,43 @@ void AssetManager::RemoveShaderFromCache(const GLulong& id)
 	}
 }
 
-GLuint64 AssetManager::GetTextureFromCache(const GLulong& id)
+GLuint64 AssetManager::GetTextureFromCache(const GLulong& id, GLuint64& texture)
 {
 	auto it = textureCache.find(id);
-	if (it != textureCache.end()) return it->second;
-	return -1;
+	if (it != textureCache.end())
+	{
+		texture = it->second;
+		return true;
+	}
+	return false;
+}
+Texture* AssetManager::GetNewTextureFromCache(const GLulong& id)
+{
+	auto it = newTextureCache.find(id);
+	if (it != newTextureCache.end()) return it->second;
+	return nullptr;
 }
 void AssetManager::AddTextureToCache(const GLulong& id, GLuint64 texture)
 {
 	textureCache[id] = texture;
 }
+void AssetManager::AddNewTextureToCache(const GLulong& id, Texture* texture)
+{
+	newTextureCache[id] = texture;
+}
 void AssetManager::RemoveTextureFromCache(const GLulong& id)
 {
 	auto it = textureCache.find(id);
-	if (it != textureCache.end())
+	if (it != textureCache.end()) textureCache.erase(it);
+}
+
+void AssetManager::RemoveNewTextureFromCache(const GLulong& id)
+{
+	auto it = newTextureCache.find(id);
+	if (it != newTextureCache.end())
 	{
-		//TODO: TEXTURE CLASS FOR CLEANUP
-		//delete it->second;
-		textureCache.erase(it);
+		delete it->second;
+		newTextureCache.erase(it);
 	}
 }
 
@@ -179,9 +224,11 @@ Shader* AssetManager::LoadShadowShader()
 
 	Shader* shadowShader = GetShaderFromCache(shaderId);
 	if (shadowShader) return shadowShader;
+
+
 	shadowShader = new Shader(shadowName, shaderId);
 	String logOutput = "Shadow shader loaded with the shaderId of ";
-	logOutput += ToString(shadowShader->shaderId);
+	logOutput += ToString(shadowShader->shaderAssetId);
 	logOutput += ".";
 	Log(logOutput);
 	AddShaderToCache(shaderId, shadowShader);

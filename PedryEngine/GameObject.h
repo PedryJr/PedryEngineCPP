@@ -4,42 +4,39 @@ class GameObject
 
 public:
 
-	Transform* transform;
+	//Transform* transform;
 
 	GameObject();
-	~GameObject();
-
-	void AddComponent(Component* component);
-	void RemoveComponent(Component* component);
-	void Update();
-	void Simulate();
+	GameObject(GLuint newId);
 
 	template<typename T>
 	requires std::is_base_of_v<Component, T>
-	T* GetComponent()
+	FORCE_INLINE T& GetComponent()
 	{
-		for (Component* component : components)
-		{
-			if (typeid(*component) == typeid(T))
-			{
-				return component;
-			}
-		}
-		return nullptr;
+
+		return T::componentArray[components[T::type]];
 	}
+
+	std::unordered_map<GLuint, GLuint> components;
 
 	template<typename T>
 	requires std::is_base_of_v<Component, T>
-	T* AddComponent()
+	FORCE_INLINE T* AddComponent()
 	{
-		T* component = new T();
-		AddComponent(component);
-		return component;
+		components[T::type] = T::componentArray.size();
+		T::CompInit();
+		T::componentArray[components[T::type]].owner = ID;
+		T::componentArray[components[T::type]].Initialize();
+		return &T::componentArray[components[T::type]];
 	}
+
+
+	static void UpdateAll();
+	GLuint ID;
+
+	static Vector<GameObject> objArr;
+	static GameObjectHandle CreateGameObject();
 
 private:
-	
-	GLuint componentCount = 0;
-	Vector<Component*> components;
 
 };

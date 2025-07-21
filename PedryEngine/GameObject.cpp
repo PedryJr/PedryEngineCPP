@@ -2,56 +2,37 @@
 
 #include "PedryEngine.h"
 
-GameObject::GameObject()
+Vector<GameObject> GameObject::objArr = Vector<GameObject>();
+
+GameObject::GameObject() {}
+
+GameObject::GameObject(GLuint newId)
+{
+    ID = newId;
+    components = std::unordered_map<GLuint, GLuint>();
+}
+
+void GameObject::UpdateAll()
 {
 
-	transform = AddComponent<Transform>();
+    MyRotator::ProcessAll();
+    Transform::ProcessAll();
+    Renderer::ProcessAll();
+    StareAtPlayerComp::ProcessAll();
+
+    MyRotator::UpdateAll();
+    Transform::UpdateAll();
+    Renderer::UpdateAll();
+    StareAtPlayerComp::UpdateAll();
 
 }
 
-GameObject::~GameObject()
+GameObjectHandle GameObject::CreateGameObject()
 {
-	// Clean up components
-	for (Component* component : components) delete component;
-	components.clear();
-	delete transform;
-}
+    GLuint objId = objArr.size();
+    GameObjectHandle newHandle = GameObjectHandle(objId);
+    GameObject& newObj = objArr.emplace_back(objId);
+    newObj.AddComponent<Transform>();
 
-void GameObject::AddComponent(Component* component)
-{
-
-	if (component == nullptr) return;
-	// Check if the component is already added
-	for (Component* existingComponent : components)
-	{
-		if (existingComponent == component) return;
-	}
-	components.push_back(component);
-	componentCount++;
-	component->transform = transform;
-	component->gameObject = this;
-	component->Initialize();
-
-}
-
-void GameObject::RemoveComponent(Component* component)
-{
-	if (component == nullptr) return;
-	// Find and remove the component
-	auto it = std::remove(components.begin(), components.end(), component);
-	if (it != components.end())
-	{
-		component->~Component();
-		components.erase(it, components.end());
-		componentCount--;
-	}
-}
-
-void GameObject::Update()
-{
-	for (int i = 0; i < componentCount; i++) components[i]->Update();
-}
-void GameObject::Simulate()
-{
-	for (int i = 0; i < componentCount; i++) components[i]->Simulate();
+    return newHandle;
 }

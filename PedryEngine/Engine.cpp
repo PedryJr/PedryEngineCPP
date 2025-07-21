@@ -4,7 +4,6 @@
 
 void Engine::Run()
 {
-	std::this_thread::sleep_for(std::chrono::seconds(2));
 
 	InitializeEngine();
 
@@ -18,7 +17,7 @@ void Engine::Run()
 
 void Engine::InitializeEngine()
 {
-	Parallel::Init(16);
+	//Engine::objectIterator.setFunction([](GameObject* obj, GLint index) { obj->Simulate(); });
 	glfwInit();
 
 	timer = TimeNow;
@@ -32,7 +31,6 @@ void Engine::InitializeEngine()
 
 void Engine::UpdateLoop()
 {
-
 	TimelineUpdate();
 	InputUpdate();
 	GameUpdate();
@@ -62,15 +60,15 @@ void Engine::GraphicsUpdate()
 
 void Engine::GameUpdate()
 {
+	GameObject::UpdateAll();
 	game->Update();
-	//Parallel::Wait();
 }
 
 GLdouble Engine::deltaTime = 0.0;
 GLdouble Engine::timeAlive = 0.0;
 
 vec3 Engine::lightPos = vec3(0.0f, 3.0f, 0.0f);
-GLfloat Engine::lightFarPlane = 1000.0f;
+GLfloat Engine::lightFarPlane = 400.0f;
 mat4 Engine::lightProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, lightFarPlane);
 
-ParallelIterator<vec4> Engine::vecIterator;
+ParallelIterator<GameObject*> Engine::objectIterator;

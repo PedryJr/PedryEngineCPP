@@ -36,7 +36,7 @@ public:
 	static GLuint64 shadowHandle;
 
 	Shader* shadowShader;
-	GLulong shaderId;
+	GLulong shaderAssetId;
 
 private:
 
@@ -52,9 +52,6 @@ private:
 	static GLuint activeModelMainTextureBuffer;
 	static GLuint activeModelHeightTextureBuffer;
 
-	//GLuint shadowId;
-
 public:
-	Vector<mat4> shadowTransforms;
 
 };

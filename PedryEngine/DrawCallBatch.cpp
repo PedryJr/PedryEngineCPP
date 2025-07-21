@@ -2,35 +2,39 @@
 #include "PedryEngine.h"
 DrawCallBatch::DrawCallBatch(Shader* shader, Mesh* mesh)
 {
+
+	renderSwizzle = new Swizzle();
+	gameSwizzle = new Swizzle();
+
 	this->notifyLayoutChange = false;
 	this->shader = shader;
 	this->mesh = mesh;
 
-	std::cout << "BATCH CREATED: " << this << std::endl;
 
 }
 
 DrawCallBatch::~DrawCallBatch()
 {
 }
-int lol;
+
+int lol = 0;
+
 void DrawCallBatch::AddBatchInstance(Transform& instanceSource, GLint batchIndex)
 {
+	GLuint64 newTextureID;
 
-	std::cout << "BATCH ASSIGNED: " << this << std::endl;
-
-
-	mat4 newMatrix = mat4(0.0f);
-	GLuint64 newTextureID = AssetManager::LoadTexture("Marble");
-
+	if (lol % 2 == 0) newTextureID = AssetManager::LoadTexture("default");
+	else newTextureID = AssetManager::LoadTexture("default");
+	newTextureID = AssetManager::LoadTexture("default");
 	lol++;
 
-	corespondingTransforms.push_back(instanceSource);
-	modelMatrices.push_back(newMatrix);
-	modelMainTextures.push_back(newTextureID);
-	modelHeightTextures.push_back(AssetManager::LoadTexture("MarbleHeight"));
+	mat4 newMatrix = mat4(1.0f);
 
-	instanceSource.SetModelLocation(modelMatrices.size() - 1, batchIndex);
-	std::cout << "NEW MATRIX INSTANCE ADRESS: " << &modelMatrices.data()[modelMatrices.size() - 1] << std::endl;
+	gameSwizzle->corespondingTransforms.push_back(&instanceSource);
+	gameSwizzle->modelMatrices.push_back(newMatrix);
+	gameSwizzle->modelMainTextures.push_back(newTextureID);
+	gameSwizzle->modelHeightTextures.push_back(newTextureID);
+
+	instanceSource.SetModelLocation(gameSwizzle->modelMatrices.size() - 1, batchIndex);
 
 }

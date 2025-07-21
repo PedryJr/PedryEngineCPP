@@ -1,15 +1,14 @@
 #version 460
 
 #extension GL_ARB_bindless_texture : require
-precision highp float;
-precision highp int;
 
 
-layout(binding = 2) buffer MainTex {
+
+layout(std430, binding = 2) buffer MainTex {
     sampler2D textures[];
 };
 
-layout(binding = 3) buffer HeightTex {
+layout(std430, binding = 3) buffer HeightTex {
     sampler2D heightMaps[];
 };
 
@@ -27,8 +26,8 @@ uniform float farPlane;
 
 out vec4 FragColor;
 
-float falloffDistance = 200.0;
-float specularStrength = 1.0;
+float falloffDistance = 400.0;
+float specularStrength = 1;
 
 const vec3 poissonDisk[20] = vec3[](
     vec3( 0.186,  0.512,  0.623), vec3(-0.320,  0.499,  0.521),
@@ -145,10 +144,20 @@ vec4 GetTextureColor()
 {
 
     sampler2D textureSampler = textures[instanceId];
-    vec4 objectColor = texture(textureSampler, FragCoord * 4);
-    objectColor = pow(objectColor, vec4(2.0));
-    objectColor = vec4(aces(objectColor.rgb), 1.0);
+    vec4 objectColor = texture(textureSampler, FragCoord);
+    objectColor = pow(objectColor, vec4(1.6));
+    objectColor = vec4(aces(objectColor.rgb), objectColor.a);
     return objectColor;
+}
+
+float AttenuateLight(float distance)
+{
+
+    //Test from desmos.
+
+    return abs(clamp(pow((2*distance), 2.2), 0.0, 1.0));
+    //\operatorname{abs}\left(\ 2x^{2.2}\right)
+
 }
 
 vec4 NormalLightImproved()
@@ -164,6 +173,7 @@ vec4 NormalLightImproved()
 
     
     float attenuation = clamp(1.0 - distance / falloffDistance, 0.0, 1.0);
+    attenuation = AttenuateLight(1.0 - distance / falloffDistance);
 
     float diff = max(dot(norm, lightDir), 0.0);
     vec3 diffuse = diff * lightColor;
@@ -190,5 +200,7 @@ void main()
 {
 
     FragColor = NormalLightImproved();
+    //FragColor = GetTextureColor();
+    //FragColor = vec4(1.0);
 
 }

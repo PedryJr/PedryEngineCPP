@@ -1,63 +1,59 @@
 #pragma once
+
+GENERATED_CLASS(Transform);
+
 class Transform : public Component
 {
 
 public:
-
-	void Initialize() override;
-	void Simulate() override;
-	void Update() override;
+	Transform();
+	//Transform(Transform&& other);
+	Transform& operator=(const Transform& other);
+	void Initialize();
+	void Demolish();
+	void __vectorcall Simulate();
+	void Update();
 
 
 	void SetRotation(const quat rotation);
-	void SetRotation(const float x, const float y, const float z);
+	void SetRotation(const GLfloat x, const GLfloat y, const GLfloat z);
 	void SetRotation(const vec3 euler);
-	void SetRotation(const float x, const float y, const float z, const float w);
-	void SetRotation(const float angle, const vec3 axis);
-
-	void AddRotation(const quat rotation);
-	void AddRotation(const float x, const float y, const float z);
-	void AddRotation(const vec3 euler);
-	void AddRotation(const float x, const float y, const float z, const float w);
-	void AddRotation(const float angle, const vec3 axis);
+	void SetRotation(const GLfloat x, const GLfloat y, const GLfloat z, const GLfloat w);
+	void SetRotation(const GLfloat angle, const vec3 axis);
 
 	void SetScale(const vec3 scale);
-	void SetScale(const float x, const float y, const float z);
-	void SetScale(const float scale);
+	void SetScale(const GLfloat x, const GLfloat y, const GLfloat z);
+	void SetScale(const GLfloat scale);
 
 	void AddScale(const vec3 scale);
-	void AddScale(const float x, const float y, const float z);
-	void AddScale(const float scale);
+	void AddScale(const GLfloat x, const GLfloat y, const GLfloat z);
+	void AddScale(const GLfloat scale);
 
 	void SetPosition(const vec3 position);
-	void SetPosition(const float x, const float y, const float z);
-	void SetPosition(const float scalar);
+	void SetPosition(const GLfloat x, const GLfloat y, const GLfloat z);
+	void SetPosition(const GLfloat scalar);
 
 	void AddPosition(const vec3 position);
-	void AddPosition(const float x, const float y, const float z);
-	void AddPosition(const float scalar);
+	void AddPosition(const GLfloat x, const GLfloat y, const GLfloat z);
+	void AddPosition(const GLfloat scalar);
 
-	mat4 scaleMatrix;
-	mat4 rotationMatrix;
-	mat4 translation;
 	mat4 modelMatrix;
+	mat4 identityMatrix = glm::identity<mat4>();
 
 	vec3 position;
 	vec3 scale;
 	quat rotation;
 
+	GLboolean useContigousArray = false;
 	GLboolean shouldUpdateTransform = false;
 	GLuint batchIndex = -1;
 	GLuint modelIndex = -1;
 
-	Vector<DrawCallBatch>* outerLocation;
-
-	void SetModelIndex(GLuint modelIndex);
-	GLuint GetModelIndex();
-
-	mat4 GetModelMatrix();
-	void UpdateModel();
+	//Vector<DrawCallBatch>* outerLocation;
 
 	void SetModelLocation(GLint modelIndex, GLint batchIndex);
 
+	Vector<DrawCallBatch>& GetOuterLocation();
+
+	GENERATED_BODY(Transform)
 };

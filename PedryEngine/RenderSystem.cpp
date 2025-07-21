@@ -27,18 +27,18 @@ void RenderSystem::PrepareShadowPass()
 
 void RenderSystem::DrawBatchShadow(DrawCallBatch* batch)
 {
-	//Drawcall data.
 	Shader& shader = *batch->shader->shadowShader;
 	Mesh& mesh = *batch->mesh;
-	mat4* instanceModels = batch->modelMatrices.data();
-	GLuint instanceCount = batch->modelMatrices.size();
+	mat4* instanceModels = batch->gameSwizzle->modelMatrices.data();
+	GLuint instanceCount = batch->gameSwizzle->modelMatrices.size();
 	GLuint elementCount = mesh.indices.size();
 
-	shader.UploadShadowLight(true);
-	Shader::EnsureUseModelMatrixBuffer(shader.GetModelMatrixBuffer());
 	Shader::EnsureUseProgram(shader.GetProgramID());
 	Shader::EnsureUseVAO(mesh.GetVAO());
 
+	shader.UploadShadowLight(true);
+
+	Shader::EnsureUseModelMatrixBuffer(shader.GetModelMatrixBuffer());
 	glBufferData(GL_SHADER_STORAGE_BUFFER, instanceCount * sizeof(mat4), instanceModels, GL_DYNAMIC_DRAW);
 	
 	glDrawElementsInstanced(GL_TRIANGLES, elementCount, GL_UNSIGNED_INT, (void*)0, instanceCount);
@@ -46,7 +46,6 @@ void RenderSystem::DrawBatchShadow(DrawCallBatch* batch)
 
 void RenderSystem::PrepareNormalPass()
 {
-
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glDrawBuffer(GL_BACK);
 	glReadBuffer(GL_BACK);
@@ -55,32 +54,32 @@ void RenderSystem::PrepareNormalPass()
 
 	Shader::shadowHandle = glGetTextureHandleARB(Shader::depthCubemap);
 	glMakeTextureHandleResidentARB(Shader::shadowHandle);
-
 }
 
 void RenderSystem::DrawBatchNormal(DrawCallBatch* batch)
 {
+
 	Shader& shader = *batch->shader;
 
 	Mesh& mesh = *batch->mesh;
-	mat4* instanceModelsMatrices = batch->modelMatrices.data();
-	GLuint64* instanceModelMainTextures = batch->modelMainTextures.data();
-	GLuint64* instanceModelHeightTextures = batch->modelHeightTextures.data();
-	GLuint instanceCount = batch->modelMatrices.size();
+	mat4* instanceModelsMatrices = batch->gameSwizzle->modelMatrices.data();
+	GLuint64* instanceModelMainTextures = batch->gameSwizzle->modelMainTextures.data();
+	GLuint64* instanceModelHeightTextures = batch->gameSwizzle->modelHeightTextures.data();
+	GLuint instanceCount = batch->gameSwizzle->modelMatrices.size();
 	GLuint elementCount = mesh.indices.size();
 
-	shader.UploadShadowLight(false);
 	Shader::EnsureUseProgram(shader.GetProgramID());
 	Shader::EnsureUseVAO(mesh.GetVAO());
+	shader.UploadShadowLight(false);
 
 	Shader::EnsureUseModelMatrixBuffer(shader.GetModelMatrixBuffer());
 	glBufferData(GL_SHADER_STORAGE_BUFFER, instanceCount * sizeof(mat4), instanceModelsMatrices, GL_DYNAMIC_DRAW);
 
 	Shader::EnsureUseModelMainTextureBuffer(shader.GetModelMainTextureBuffer());
-	glNamedBufferStorage(shader.GetModelMainTextureBuffer(), sizeof(GLuint64) * instanceCount, (const void*)instanceModelMainTextures, GL_DYNAMIC_STORAGE_BIT);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, instanceCount * sizeof(GLuint64), instanceModelMainTextures, GL_DYNAMIC_DRAW);
 
 	Shader::EnsureUseModelHeightTextureBuffer(shader.GetModelHeightTextureBuffer());
-	glNamedBufferStorage(shader.GetModelMainTextureBuffer(), sizeof(GLuint64) * instanceCount, (const void*)instanceModelHeightTextures, GL_DYNAMIC_STORAGE_BIT);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, instanceCount * sizeof(GLuint64), instanceModelHeightTextures, GL_DYNAMIC_DRAW);
 
 	glDrawElementsInstanced(GL_TRIANGLES, elementCount, GL_UNSIGNED_INT, (void*)0, instanceCount);
 
@@ -102,7 +101,7 @@ void RenderSystem::SetupWindowHints()
 {
 	
 
-	glfwWindowHint(GLFW_SAMPLES, 8);
+	glfwWindowHint(GLFW_SAMPLES, 0);
 	
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
 	glfwWindowHint(GLFW_CONTEXT_CREATION_API, GLFW_NATIVE_CONTEXT_API);
@@ -110,11 +109,7 @@ void RenderSystem::SetupWindowHints()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	// Set the windowed mode hints
 	glfwWindowHint(GLFW_RESIZABLE, 1);
-	//glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, 1);
-
-	//Coor bits
 
 }
 
@@ -122,12 +117,16 @@ void RenderSystem::InitializeMonitor()
 {
 	monitor = glfwGetPrimaryMonitor();
 	glfwGetMonitorWorkarea(monitor, NULL, NULL, &width, &height);
+	width = 2560;
+	height = 1440;
 }
 
 void RenderSystem::OpenGLEnableCaps()
 {
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
+
+	glCullFace(GL_BACK);
 
 	glDepthFunc(GL_LESS);
 }
@@ -145,19 +144,17 @@ GLFWwindow* RenderSystem::GetWindow()
 
 void RenderSystem::DisplaySettings()
 {
-
 	glfwSwapInterval(0);
 	glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwSetWindowSize(window, width, height);
-
 }
 
 void RenderSystem::Finalize()
 {
-	OpenGLEnableCaps();
-	glClearColor(0.0, 0.0, 0.0, 0.4);
+	glClearColor(0.0, 0.0, 0.0, 0.0);
 	glewInit();
+	OpenGLEnableCaps();
 }
 
 GLFWwindow* RenderSystem::window = nullptr;

@@ -3,27 +3,38 @@
 void MyRotator::Initialize()
 {
 	offset = 0;
-	transform->SetScale(vec3(1.5f));
+	GetGameObject().GetComponent<Transform>().SetScale(vec3(1.5f));
 }
 
-void MyRotator::Simulate()
+void __vectorcall MyRotator::Simulate()
 {
 
 	timer += DeltaTime / 5;
 
 	timeLine = timer + (2.f * glm::pi<float>() / 8.f * offset);
 
-	xPos = glm::sin(timeLine) * 15.f;
-	zPos = glm::cos(timeLine) * 15.f;
+	xPos = glm::sin(timeLine) * 15.f * radius;
+	yPos = -30.f + heightOffset;
+	zPos = glm::cos(timeLine) * 15.f * radius;
+
 	xRot = xPos * 360.f / 15.f;
 	zRot = zPos * 360.f / 15.f;
+	yRot = yPos * 360.f / 15.f;
+
+	calculatedPosition = vec3(xPos, yPos, zPos) + circulationPoint;
+	calculatedRotation = vec3(xRot, yRot, zRot);
 
 }
 
-void MyRotator::Update()
+void __vectorcall MyRotator::Update()
+{
+	Transform& transform = GetGameObject().GetComponent<Transform>();
+	transform.SetPosition(calculatedPosition);
+	transform.SetRotation(calculatedRotation);
+}
+
+void MyRotator::Demolish()
 {
 
-	transform->SetRotation(vec3(xRot, 0, zRot));
-	transform->SetPosition(vec3(xPos, -30.f, zPos));
-
 }
+GENERATED_ACTION(MyRotator)

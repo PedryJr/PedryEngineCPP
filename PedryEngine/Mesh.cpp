@@ -41,7 +41,7 @@ namespace std {
 
 Mesh::Mesh(ufbx_mesh* loadedMesh, const GLulong& meshId)
 {
-	this->meshId = meshId;
+	this->meshAssetId = meshId;
 
 	Vector<GLfloat>& storedVertices = this->vertices;
 	Vector<GLfloat>& storedNormals = this->normals;

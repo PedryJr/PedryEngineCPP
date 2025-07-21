@@ -1,0 +1,24 @@
+// Hint files help the Visual Studio IDE interpret Visual C++ identifiers
+// such as names of functions and macros.
+// For more information see https://go.microsoft.com/fwlink/?linkid=865984
+#define GENERATED_ACTION(ComponentType)                                     \
+Vector<ComponentType> ComponentType::componentArray;                        \
+GLuint ComponentType::type = typeid(ComponentType).hash_code();
+
+#define GENERATED_BODY(ComponentType)                                       \
+public:                                                                     \
+    static GLuint type;                                                     \
+    static Vector<ComponentType> componentArray;                            \
+    static void ProcessAll() {                                              \
+        for (auto& comp : componentArray) comp.Simulate();                  \
+    }                                                                       \
+    static void UpdateAll() {                                                   \
+                                                                            \
+        for (auto& comp : componentArray) comp.Update();                    \
+    }                                                                           \
+    static void CompInit()                                                      \
+    {                                                                           \
+        GLuint ecsGhost = componentArray.size();                                   \
+        componentArray.emplace_back();                          \
+        componentArray[ecsGhost].ecsGhost = ecsGhost;                          \
+    }

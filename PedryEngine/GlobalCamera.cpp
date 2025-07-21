@@ -94,7 +94,7 @@ void GlobalCamera::UpdateInput(GLfloat deltaTime)
 	translatedMovement += -right * inputDirection.x;
 	translatedMovement += vec_UP * inputDirection.y;
 
-	aimPositionTarget += translatedMovement * deltaTime * 10.0F;
+	aimPositionTarget += translatedMovement * deltaTime * 50.0F;
 
 	aimDirection = PedryMath::Lerp(aimDirection, aimDirectionTarget, deltaTime * 60.0F);
 	aimPosition = PedryMath::Lerp(aimPosition, aimPositionTarget, deltaTime * 60.0F);

@@ -7,6 +7,7 @@ public:
 	void Run();
 	bool shouldTerminate;
 	static ParallelIterator<vec4> vecIterator;
+	static ParallelIterator<GameObject*> objectIterator;
 
 	static FORCE_INLINE GLdouble InnerDeltaTime() { return deltaTime; }
 	static FORCE_INLINE GLdouble InnerTimeAlive() { return timeAlive; }
